@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simulador de ondas senoidales · Sistemas de Potencia</title>
+<style>
+:root{
+  --bg:#f3f5f7;
+  --panel:#ffffff;
+  --panel2:#eef2f5;
+  --text:#17202a;
+  --muted:#66717d;
+  --border:#cfd6dd;
+  --accent:#2563eb;
+  --screen:#0e141b;
+  --grid:#334155;
+  --axis:#94a3b8;
+  --ch1:#22c55e;
+  --ch2:#f59e0b;
+  --ch3:#38bdf8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  background:#111827;
+  color:white;
+  padding:18px 22px;
+}
+header h1{margin:0;font-size:clamp(1.2rem,2.5vw,1.8rem)}
+header p{margin:4px 0 0;color:#cbd5e1;font-size:.95rem}
+main{max-width:1400px;margin:auto;padding:18px}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 330px;
+  gap:16px;
+  align-items:start;
+}
+.screen-card,.control-panel,.toolbar,.help{
+  border:1px solid var(--border);
+  background:var(--panel);
+  border-radius:14px;
+}
+.screen-card{padding:12px}
+.screen{
+  background:var(--screen);
+  border-radius:12px;
+  padding:10px;
+  overflow:auto;
+}
+.screen-top,.screen-bottom{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  color:#cbd5e1;
+  font-size:.82rem;
+  flex-wrap:wrap;
+}
+.screen-top{margin-bottom:6px}
+.screen-bottom{margin-top:6px}
+svg{display:block;width:100%;min-width:640px;height:auto}
+.toolbar{
+  margin-top:12px;
+  padding:12px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+}
+button,select,input{
+  font:inherit;
+}
+button,select,input[type=text]{
+  border:1px solid var(--border);
+  background:white;
+  border-radius:9px;
+  min-height:42px;
+}
+button{
+  padding:8px 12px;
+  cursor:pointer;
+  font-weight:600;
+}
+button:hover{background:#f8fafc}
+select{padding:7px 10px}
+.control-panel{
+  padding:14px;
+  position:sticky;
+  top:12px;
+}
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:12px;
+}
+.panel-head h2{font-size:1rem;margin:0}
+.panel-head p{font-size:.78rem;color:var(--muted);margin:3px 0 0}
+.channels{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:12px;
+}
+.channel-btn.active{
+  background:#dbeafe;
+  border-color:#60a5fa;
+}
+.enable-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0 12px;
+  border-bottom:1px solid var(--border);
+}
+.channel-color{width:38px;height:10px;border-radius:10px}
+.knobs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  padding-top:12px;
+}
+.knob-wrap{text-align:center;min-width:0}
+.knob-label{font-size:.73rem;font-weight:700;margin-bottom:5px}
+.knob{
+  width:78px;
+  height:78px;
+  border-radius:50%;
+  border:5px solid var(--border);
+  background:radial-gradient(circle at 40% 35%,#fff 0 28%,#e5e7eb 29% 62%,#cbd5e1 63% 100%);
+  position:relative;
+  margin:auto;
+  touch-action:none;
+  cursor:ns-resize;
+}
+.knob:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}
+.pointer{
+  position:absolute;
+  left:50%;
+  top:7px;
+  width:3px;
+  height:25px;
+  border-radius:3px;
+  background:var(--accent);
+  transform-origin:50% 31px;
+  transform:translateX(-50%) rotate(0deg);
+}
+.value{
+  margin-top:5px;
+  font-weight:700;
+  font-size:.9rem;
+  font-variant-numeric:tabular-nums;
+}
+.stepper{
+  display:flex;
+  justify-content:center;
+  gap:4px;
+  margin-top:5px;
+}
+.stepper button{
+  width:34px;
+  min-height:32px;
+  padding:0;
+}
+.expression{
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+.expression label{
+  display:block;
+  font-size:.75rem;
+  font-weight:700;
+  margin-bottom:5px;
+}
+.expression input{width:100%;padding:8px 10px;font-family:Consolas,monospace}
+.hint{font-size:.75rem;color:var(--muted);margin-top:5px;min-height:18px}
+.metrics{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+.metric{
+  background:var(--panel2);
+  border-radius:9px;
+  padding:9px;
+}
+.metric span{display:block;font-size:.72rem;color:var(--muted)}
+.metric strong{font-size:.86rem}
+.help{
+  margin-top:16px;
+  padding:14px;
+  font-size:.9rem;
+}
+.help h3{margin:0 0 6px;font-size:1rem}
+.help code{font-family:Consolas,monospace}
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:8px;
+  font-size:.8rem;
+}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-line{width:26px;height:4px;border-radius:4px}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .control-panel{position:static}
+}
+@media(max-width:520px){
+  main{padding:10px}
+  header{padding:14px}
+  .knob{width:70px;height:70px}
+  .knobs{gap:3px}
+}
+
+.dual-display{
+  display:grid;
+  grid-template-columns:minmax(280px,34%) minmax(0,1fr);
+  gap:14px;
+  align-items:stretch;
+}
+.phasor-panel{
+  background:#0e141b;
+  border-radius:12px;
+  padding:10px;
+  color:#cbd5e1;
+  min-width:0;
+}
+.display-title{
+  font-size:.82rem;
+  font-weight:700;
+  margin-bottom:6px;
+}
+#phasorPlot{
+  width:100%;
+  min-width:0;
+  aspect-ratio:1/1;
+  height:auto;
+}
+.phasor-note{
+  text-align:center;
+  font-size:.72rem;
+  color:#94a3b8;
+  margin-top:4px;
+}
+.controls-bottom{
+  margin-top:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  background:var(--panel);
+}
+.channels-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin-bottom:12px;
+}
+.active-toggle{
+  margin-left:8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.knobs-row{
+  display:grid;
+  grid-template-columns:repeat(3,110px) minmax(240px,1fr) minmax(260px,1fr);
+  gap:14px;
+  align-items:center;
+}
+.compact-expression{
+  margin:0;
+  padding:0;
+  border:0;
+}
+.compact-metrics{
+  margin:0;
+}
+.screen{height:100%}
+.screen-card{padding:12px}
+@media(max-width:1100px){
+  .dual-display{grid-template-columns:320px minmax(0,1fr)}
+  .knobs-row{grid-template-columns:repeat(3,100px) 1fr}
+  .compact-metrics{grid-column:1/-1}
+}
+@media(max-width:850px){
+  .dual-display{grid-template-columns:1fr}
+  .phasor-panel{max-width:520px;width:100%;margin:auto}
+  .knobs-row{grid-template-columns:repeat(3,1fr)}
+  .compact-expression,.compact-metrics{grid-column:1/-1}
+}
+@media(max-width:520px){
+  .knobs-row{grid-template-columns:repeat(3,1fr);gap:6px}
+  .knob{width:66px;height:66px}
+  .stepper button{width:30px}
+  .active-toggle{margin-left:0}
+}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>Simulador interactivo de ondas senoidales</h1>
+  <p>Sistemas de Potencia · amplitud, frecuencia, desfase y superposición de hasta 3 funciones</p>
+</header>
+
+
+<main>
+  <section class="screen-card">
+    <div class="dual-display">
+      <div class="phasor-panel">
+        <div class="display-title">DIAGRAMA FASORIAL</div>
+        <svg id="phasorPlot" viewBox="0 0 360 360" role="img" aria-label="Diagrama fasorial de las ondas activas"></svg>
+        <div class="phasor-note">Referencia angular: eje real positivo</div>
+      </div>
+
+      <div class="screen">
+        <div class="screen-top">
+          <strong>OSCILOSCOPIO VIRTUAL</strong>
+          <span id="scopeInfo">Ventana 40 ms · 1 canal activo</span>
+        </div>
+        <svg id="plot" viewBox="0 0 820 470" role="img" aria-label="Representación temporal de las ondas con escala angular y temporal"></svg>
+        <div class="screen-bottom">
+          <span id="readout">CH1: 325 · 50 Hz · 0°</span>
+          <span>Tiempo →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-bottom">
+      <div class="channels-row">
+        <button class="channel-btn active" data-ch="0">CH1</button>
+        <button class="channel-btn" data-ch="1">CH2</button>
+        <button class="channel-btn" data-ch="2">CH3</button>
+
+        <label class="active-toggle"><input id="enabled" type="checkbox" checked> Canal activo</label>
+        <span id="channelColor" class="channel-color" style="background:var(--ch1)"></span>
+      </div>
+
+      <div class="knobs-row">
+        <div class="knob-wrap">
+          <div class="knob-label">AMPLITUD</div>
+          <button class="knob" data-control="amp" type="button" aria-label="Ajustar amplitud"><span class="pointer"></span></button>
+          <div class="value" id="ampValue">325</div>
+          <div class="stepper"><button data-dec="amp" type="button">−</button><button data-inc="amp" type="button">+</button></div>
+        </div>
+
+        <div class="knob-wrap">
+          <div class="knob-label">FRECUENCIA</div>
+          <button class="knob" data-control="freq" type="button" aria-label="Ajustar frecuencia"><span class="pointer"></span></button>
+          <div class="value"><span id="freqValue">50</span> Hz</div>
+          <div class="stepper"><button data-dec="freq" type="button">−</button><button data-inc="freq" type="button">+</button></div>
+        </div>
+
+        <div class="knob-wrap">
+          <div class="knob-label">DESFASE</div>
+          <button class="knob" data-control="phase" type="button" aria-label="Ajustar desfase"><span class="pointer"></span></button>
+          <div class="value"><span id="phaseValue">0</span>°</div>
+          <div class="stepper"><button data-dec="phase" type="button">−</button><button data-inc="phase" type="button">+</button></div>
+        </div>
+
+        <div class="expression compact-expression">
+          <label for="expr">FUNCIÓN DEL CANAL</label>
+          <input id="expr" type="text" value="325*sin(2*pi*50*t+0deg)">
+          <div id="hint" class="hint">Editable manualmente.</div>
+        </div>
+
+        <div class="metrics compact-metrics">
+          <div class="metric"><span>Periodo</span><strong id="periodValue">20 ms</strong></div>
+          <div class="metric"><span>Pulsación ω</span><strong id="omegaValue">314,2 rad/s</strong></div>
+          <div class="metric"><span>Pico a pico</span><strong id="ppValue">650</strong></div>
+          <div class="metric"><span>Valor eficaz</span><strong id="rmsValue">229,8</strong></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <label><input id="showSum" type="checkbox"> Mostrar suma</label>
+        <label>Base de tiempos
+          <select id="timeBase">
+            <option value="20">20 ms</option>
+            <option value="40" selected>40 ms</option>
+            <option value="80">80 ms</option>
+            <option value="120">120 ms</option>
+            <option value="200">200 ms</option>
+          </select>
+        </label>
+        <button id="threePhase" type="button">Sistema trifásico 50 Hz</button>
+        <button id="reset" type="button">Restablecer</button>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="legend-line" style="background:var(--ch1)"></span>CH1</div>
+        <div class="legend-item"><span class="legend-line" style="background:var(--ch2)"></span>CH2</div>
+        <div class="legend-item"><span class="legend-line" style="background:var(--ch3)"></span>CH3</div>
+        <div class="legend-item"><span class="legend-line" style="background:#e2e8f0"></span>Suma</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="help">
+    <h3>Uso</h3>
+    <div>Selecciona CH1, CH2 o CH3 y gira las ruedas arrastrando verticalmente. El diagrama fasorial y la onda temporal se actualizan en tiempo real al cambiar amplitud o desfase.</div>
+    <div style="margin-top:6px">La expresión editable admite el formato <code>325*sin(2*pi*50*t-30deg)</code>.</div>
+  </div>
+</main>
+
+
+<script>
+(() => {
+  const svg = document.getElementById('plot');
+  const phasorSvg = document.getElementById('phasorPlot');
+  const NS = 'http://www.w3.org/2000/svg';
+  const colors = ['#22c55e','#f59e0b','#38bdf8'];
+  const states = [
+    {enabled:true, amp:325, freq:50, phase:0, kind:'sin'},
+    {enabled:false, amp:325, freq:50, phase:-120, kind:'sin'},
+    {enabled:false, amp:325, freq:50, phase:120, kind:'sin'}
+  ];
+  let active = 0;
+
+  const ranges = {
+    amp:[0,500,1],
+    freq:[1,100,1],
+    phase:[-180,180,1]
+  };
+
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const clamp = (v,a,b) => Math.max(a, Math.min(b, Number(v)));
+  const fmt = (n,d=1) => Number(n).toFixed(d).replace('.',',').replace(/,0$/,'');
+
+  function expression(s){
+    const sign = s.phase >= 0 ? '+' : '';
+    return `${Math.round(s.amp)}*${s.kind}(2*pi*${Math.round(s.freq)}*t${sign}${Math.round(s.phase)}deg)`;
+  }
+
+  function parseExpression(v){
+    const m = v.toLowerCase()
+      .replace(/\s+/g,'')
+      .replace(/π/g,'pi')
+      .replace(/,/g,'.')
+      .match(/^([+-]?\d+(?:\.\d+)?)\*(sin|cos)\(2\*pi\*([+-]?\d+(?:\.\d+)?)\*t(?:([+-]\d+(?:\.\d+)?)deg)?\)$/);
+    if(!m) return null;
+    return {
+      amp:clamp(m[1],0,500),
+      kind:m[2],
+      freq:clamp(m[3],1,100),
+      phase:clamp(m[4] || 0,-180,180)
+    };
+  }
+
+  function valueAt(s,t){
+    const a = 2*Math.PI*s.freq*t + s.phase*Math.PI/180;
+    return s.amp * (s.kind === 'cos' ? Math.cos(a) : Math.sin(a));
+  }
+
+  function add(tag, attrs={}){
+    const e = document.createElementNS(NS,tag);
+    Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+    svg.appendChild(e);
+    return e;
+  }
+
+  function knobAngle(type,value){
+    const [mn,mx] = ranges[type];
+    return -135 + 270*(value-mn)/(mx-mn);
+  }
+
+  function refreshPanel(){
+    const s = states[active];
+    $$('.channel-btn').forEach((b,i)=>b.classList.toggle('active',i===active));
+    $('#enabled').checked = s.enabled;
+    $('#channelColor').style.background = colors[active];
+    $('#ampValue').textContent = fmt(s.amp,0);
+    $('#freqValue').textContent = fmt(s.freq,0);
+    $('#phaseValue').textContent = fmt(s.phase,0);
+    $('#expr').value = expression(s);
+    $('#periodValue').textContent = fmt(1000/s.freq,2)+' ms';
+    $('#omegaValue').textContent = fmt(2*Math.PI*s.freq,1)+' rad/s';
+    $('#ppValue').textContent = fmt(2*s.amp,1);
+    $('#rmsValue').textContent = fmt(s.amp/Math.sqrt(2),1);
+    $('#readout').textContent = `CH${active+1}: ${fmt(s.amp,0)} · ${fmt(s.freq,0)} Hz · ${fmt(s.phase,0)}°`;
+    $$('.knob').forEach(k=>{
+      const type = k.dataset.control;
+      k.querySelector('.pointer').style.transform =
+        `translateX(-50%) rotate(${knobAngle(type,s[type])}deg)`;
+    });
+  }
+
+
+  function addPhasor(tag, attrs={}){
+    const e = document.createElementNS(NS,tag);
+    Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+    phasorSvg.appendChild(e);
+    return e;
+  }
+
+  function drawPhasor(){
+    while(phasorSvg.firstChild) phasorSvg.removeChild(phasorSvg.firstChild);
+
+    const W=360,H=360,cx=180,cy=180,R=145;
+    const enabled = states.filter(s=>s.enabled);
+    const maxAmp = Math.max(1, ...enabled.map(s=>Math.abs(s.amp)));
+
+    // Background grid and circles
+    [0.25,0.5,0.75,1].forEach(fr=>{
+      addPhasor('circle',{
+        cx,cy,r:R*fr,fill:'none',stroke:'#334155','stroke-width':'1'
+      });
+    });
+    addPhasor('line',{x1:25,y1:cy,x2:335,y2:cy,stroke:'#64748b','stroke-width':'1.3'});
+    addPhasor('line',{x1:cx,y1:25,x2:cx,y2:335,stroke:'#64748b','stroke-width':'1.3'});
+
+    const lab1=addPhasor('text',{x:338,y:cy-6,fill:'#94a3b8','font-size':'11','text-anchor':'end'}); lab1.textContent='Re';
+    const lab2=addPhasor('text',{x:cx+7,y:18,fill:'#94a3b8','font-size':'11'}); lab2.textContent='Im';
+
+    states.forEach((s,i)=>{
+      if(!s.enabled) return;
+
+      // For sin(wt+phi), use phi as requested visual phase reference.
+      const a = s.phase*Math.PI/180;
+      const len = R*(Math.abs(s.amp)/maxAmp);
+      const x2 = cx + len*Math.cos(a);
+      const y2 = cy - len*Math.sin(a);
+
+      addPhasor('line',{
+        x1:cx,y1:cy,x2,y2,
+        stroke:colors[i],'stroke-width':'4','stroke-linecap':'round'
+      });
+
+      // Arrow head
+      const head=11;
+      const ux=Math.cos(a), uy=-Math.sin(a);
+      const px=-uy, py=ux;
+      const bx=x2-head*ux, by=y2-head*uy;
+      const p1=`${x2},${y2}`;
+      const p2=`${bx+5*px},${by+5*py}`;
+      const p3=`${bx-5*px},${by-5*py}`;
+      addPhasor('polygon',{points:`${p1} ${p2} ${p3}`,fill:colors[i]});
+
+      const tx = cx + (len+18)*Math.cos(a);
+      const ty = cy - (len+18)*Math.sin(a);
+      const lbl=addPhasor('text',{
+        x:tx,y:ty,fill:colors[i],'font-size':'12','font-weight':'700',
+        'text-anchor':Math.cos(a)<-0.2?'end':Math.cos(a)>0.2?'start':'middle'
+      });
+      lbl.textContent=`CH${i+1}  ${Math.round(s.amp)}∠${Math.round(s.phase)}°`;
+    });
+
+    // Active channel phase arc
+    const s=states[active];
+    if(s.enabled && Math.abs(s.phase)>0.5){
+      const rr=45;
+      const start=0;
+      const end=s.phase*Math.PI/180;
+      const steps=50;
+      let d='';
+      for(let k=0;k<=steps;k++){
+        const a=start+(end-start)*k/steps;
+        const x=cx+rr*Math.cos(a);
+        const y=cy-rr*Math.sin(a);
+        d+=(k?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)+' ';
+      }
+      addPhasor('path',{d,fill:'none',stroke:colors[active],'stroke-width':'2'});
+    }
+  }
+
+  function draw(){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+
+    const W=820,H=470,l=54,r=18,t=18,b=78;
+    const pw=W-l-r, ph=H-t-b;
+    const ms = Number($('#timeBase').value);
+    const tmax = ms/1000;
+    const enabled = states.filter(s=>s.enabled);
+    const sumOn = $('#showSum').checked;
+
+    const ymax = Math.max(
+      1,
+      ...enabled.map(s=>Math.abs(s.amp)),
+      sumOn ? enabled.reduce((a,s)=>a+Math.abs(s.amp),0) : 0
+    ) * 1.15;
+
+    const X = x => l + x/tmax*pw;
+    const Y = v => t + ph/2 - v/ymax*(ph/2);
+
+    // Eje horizontal didáctico: ángulo eléctrico θ = ωt y su equivalente temporal.
+    // La referencia se toma del canal actualmente seleccionado.
+    const ref = states[active];
+    const fRef = Math.max(0.001, ref.freq);
+    const omegaRef = 2*Math.PI*fRef;
+    const totalQuarterSteps = Math.floor((omegaRef*tmax) / (Math.PI/4) + 1e-9);
+
+    // Evita saturar la gráfica cuando hay mucha frecuencia o una ventana temporal grande.
+    let quarterStride = 1;
+    while(Math.floor(totalQuarterSteps/quarterStride) > 20) quarterStride *= 2;
+
+    function angleLabel(q){
+      if(q===0) return '0';
+      const g = (a,b) => b ? g(b,a%b) : a;
+      const d = g(q,4);
+      const num = q/d, den = 4/d;
+      if(den===1) return num===1 ? 'π' : `${num}π`;
+      return num===1 ? `π/${den}` : `${num}π/${den}`;
+    }
+
+    for(let q=0; q<=totalQuarterSteps; q+=quarterStride){
+      const theta = q*(Math.PI/4);
+      const tt = theta/omegaRef;
+      if(tt > tmax + 1e-10) break;
+      const x = X(tt);
+
+      const isPi2 = q % 2 === 0;
+      const isPi = q % 4 === 0;
+      const is2Pi = q % 8 === 0;
+      const stroke = is2Pi ? '#64748b' : isPi ? '#526071' : isPi2 ? '#405064' : '#334155';
+      const sw = is2Pi ? '1.7' : isPi ? '1.4' : '1';
+
+      add('line',{x1:x,y1:t,x2:x,y2:t+ph,stroke,'stroke-width':sw});
+
+      const aTxt=add('text',{
+        x,y:H-38,'text-anchor':'middle',
+        fill:isPi?'#cbd5e1':'#94a3b8',
+        'font-size':isPi?'11':'10',
+        'font-weight':isPi?'700':'400'
+      });
+      aTxt.textContent=angleLabel(q);
+
+      const msTxt=add('text',{
+        x,y:H-22,'text-anchor':'middle',
+        fill:'#7f8b99','font-size':'9.5'
+      });
+      msTxt.textContent=`${fmt(tt*1000,2)} ms`;
+    }
+
+    const axisTitle=add('text',{
+      x:l+pw/2,y:H-4,'text-anchor':'middle',
+      fill:'#94a3b8','font-size':'10.5'
+    });
+    axisTitle.textContent=`θ = ωt (rad)  ·  t (ms)  ·  referencia CH${active+1}: f=${fmt(fRef,1)} Hz, ω=${fmt(omegaRef,1)} rad/s`;
+
+    for(let j=-4;j<=4;j++){
+      const v=ymax*j/4;
+      const y=Y(v);
+      add('line',{
+        x1:l,y1:y,x2:l+pw,y2:y,
+        stroke:j===0?'#94a3b8':'#334155',
+        'stroke-width':j===0?'1.5':'1'
+      });
+      const ty=add('text',{x:l-8,y:y+4,'text-anchor':'end',fill:'#94a3b8','font-size':'11'});
+      ty.textContent=fmt(v,0);
+    }
+
+    const n=1000;
+    states.forEach((s,i)=>{
+      if(!s.enabled) return;
+      let d='';
+      for(let k=0;k<=n;k++){
+        const tt=tmax*k/n;
+        d += (k?'L':'M') + X(tt).toFixed(2)+' '+Y(valueAt(s,tt)).toFixed(2)+' ';
+      }
+      add('path',{
+        d,fill:'none',stroke:colors[i],
+        'stroke-width':'2.6','stroke-linecap':'round','stroke-linejoin':'round'
+      });
+    });
+
+    if(sumOn && enabled.length){
+      let d='';
+      for(let k=0;k<=n;k++){
+        const tt=tmax*k/n;
+        const v=enabled.reduce((a,s)=>a+valueAt(s,tt),0);
+        d += (k?'L':'M') + X(tt).toFixed(2)+' '+Y(v).toFixed(2)+' ';
+      }
+      add('path',{
+        d,fill:'none',stroke:'#e2e8f0',
+        'stroke-width':'2','stroke-dasharray':'7 5'
+      });
+    }
+
+    $('#scopeInfo').textContent =
+      `Ventana ${ms} ms · ${enabled.length} canal${enabled.length===1?'':'es'} activo${enabled.length===1?'':'s'}`;
+
+    refreshPanel();
+    drawPhasor();
+  }
+
+  function update(type,delta){
+    const s=states[active];
+    const [mn,mx,step]=ranges[type];
+    s[type]=clamp(Math.round((s[type]+delta)/step)*step,mn,mx);
+    s.enabled=true;
+    draw();
+  }
+
+  $$('.channel-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      active=Number(b.dataset.ch);
+      refreshPanel();
+    });
+  });
+
+  $('#enabled').addEventListener('change',e=>{
+    states[active].enabled=e.target.checked;
+    draw();
+  });
+
+  $$('[data-inc]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const type=b.dataset.inc;
+      update(type,type==='phase'?5:type==='freq'?1:5);
+    });
+  });
+
+  $$('[data-dec]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const type=b.dataset.dec;
+      update(type,type==='phase'?-5:type==='freq'?-1:-5);
+    });
+  });
+
+  $$('.knob').forEach(k=>{
+    const type=k.dataset.control;
+    let sy=0, sv=0, dragging=false;
+
+    k.addEventListener('pointerdown',e=>{
+      dragging=true;
+      sy=e.clientY;
+      sv=states[active][type];
+      k.setPointerCapture(e.pointerId);
+    });
+
+    k.addEventListener('pointermove',e=>{
+      if(!dragging) return;
+      const [mn,mx]=ranges[type];
+      const span=mx-mn;
+      states[active][type]=Math.round(clamp(sv+(sy-e.clientY)*span/180,mn,mx));
+      states[active].enabled=true;
+      draw();
+    });
+
+    k.addEventListener('pointerup',()=>dragging=false);
+    k.addEventListener('pointercancel',()=>dragging=false);
+
+    k.addEventListener('keydown',e=>{
+      if(!['ArrowUp','ArrowRight','ArrowDown','ArrowLeft'].includes(e.key)) return;
+      e.preventDefault();
+      const sign=(e.key==='ArrowUp'||e.key==='ArrowRight')?1:-1;
+      update(type,sign*(type==='phase'?5:type==='freq'?1:5));
+    });
+
+    k.addEventListener('wheel',e=>{
+      if(document.activeElement!==k) return;
+      e.preventDefault();
+      update(type,(e.deltaY<0?1:-1)*(type==='phase'?5:type==='freq'?1:5));
+    },{passive:false});
+  });
+
+  $('#expr').addEventListener('change',e=>{
+    const p=parseExpression(e.target.value);
+    const hint=$('#hint');
+    if(!p){
+      hint.textContent='Formato no reconocido. Ejemplo: 325*sin(2*pi*50*t-30deg)';
+      hint.style.color='#b91c1c';
+      return;
+    }
+    Object.assign(states[active],p,{enabled:true});
+    hint.textContent='Expresión aplicada.';
+    hint.style.color='';
+    draw();
+  });
+
+  $('#timeBase').addEventListener('change',draw);
+  $('#showSum').addEventListener('change',draw);
+
+  $('#threePhase').addEventListener('click',()=>{
+    [0,-120,120].forEach((p,i)=>{
+      Object.assign(states[i],{
+        enabled:true,amp:325,freq:50,phase:p,kind:'sin'
+      });
+    });
+    active=0;
+    $('#timeBase').value='40';
+    draw();
+  });
+
+  $('#reset').addEventListener('click',()=>{
+    [0,-120,120].forEach((p,i)=>{
+      Object.assign(states[i],{
+        enabled:i===0,amp:325,freq:50,phase:p,kind:'sin'
+      });
+    });
+    active=0;
+    $('#timeBase').value='40';
+    $('#showSum').checked=false;
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>
