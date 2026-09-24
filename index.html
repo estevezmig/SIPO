@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIPO · Sistemas de Potencia</title>
+  <style>
+    :root{
+      --bg:#f4f7fb; --card:#ffffff; --text:#172033; --muted:#657089;
+      --accent:#1f5f8b; --border:#dbe3ec;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--text);
+      background:var(--bg);
+    }
+    header{
+      background:#17324d; color:white; padding:34px 22px;
+    }
+    header .wrap, main{max-width:1100px;margin:auto}
+    h1{margin:0 0 8px;font-size:2rem}
+    header p{margin:0;color:#dbe8f3}
+    main{padding:34px 22px 50px}
+    h2{margin:0 0 18px}
+    .grid{
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:18px;
+    }
+    .card{
+      background:var(--card); border:1px solid var(--border); border-radius:14px;
+      padding:22px; box-shadow:0 3px 12px rgba(20,40,70,.06);
+    }
+    .card h3{margin:0 0 8px}
+    .card p{color:var(--muted); line-height:1.45; min-height:52px}
+    .btn{
+      display:inline-block; margin-top:8px; padding:10px 14px; border-radius:9px;
+      background:var(--accent); color:#fff; text-decoration:none; font-weight:700;
+    }
+    .soon{
+      background:#eef2f6; color:#7b8491;
+    }
+    footer{max-width:1100px;margin:auto;padding:0 22px 30px;color:#7b8491;font-size:.9rem}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>SIPO · Sistemas de Potencia</h1>
+    <p>Recursos y simuladores interactivos para el módulo de Sistemas de Potencia.</p>
+  </div>
+</header>
+
+<main>
+  <h2>Simuladores</h2>
+  <div class="grid">
+    <section class="card">
+      <h3>Ondas senoidales y fasores</h3>
+      <p>Simulación interactiva de amplitud, frecuencia, fase y representación fasorial.</p>
+      <a class="btn" href="simuladores/ondas/">Abrir simulador</a>
+    </section>
+
+    <section class="card">
+      <h3>Circuitos RLC</h3>
+      <p>Próximamente: resistencia, reactancias, impedancia y desfases.</p>
+      <span class="btn soon">Próximamente</span>
+    </section>
+
+    <section class="card">
+      <h3>Sistema trifásico</h3>
+      <p>Próximamente: tensiones trifásicas, estrella y triángulo.</p>
+      <span class="btn soon">Próximamente</span>
+    </section>
+
+    <section class="card">
+      <h3>Potencias P · Q · S</h3>
+      <p>Próximamente: potencia activa, reactiva, aparente y factor de potencia.</p>
+      <span class="btn soon">Próximamente</span>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Material didáctico · Sistemas de Potencia
+</footer>
+</body>
+</html>
