@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador RLC serie · SIPO</title>
+<style>
+:root{--bg:#f3f6fa;--ink:#17243a;--muted:#546477;--line:#d7e1eb;--blue:#2563eb;--orange:#df7218;--green:#0d9066;--purple:#8554c7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:#142a44;color:white;padding:20px max(20px,calc((100vw - 1250px)/2))}
+header a{color:#bfddff;text-decoration:none;font-size:.9rem}header h1{margin:8px 0 2px;font-size:clamp(1.5rem,3vw,2rem)}header p{margin:0;color:#cdd9e6}
+main{max-width:1290px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(275px,325px) minmax(0,1fr);gap:16px;align-items:start}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 2px 10px #1a38500a}
+h2{font-size:1.13rem;margin:0 0 13px}h3{font-size:1rem;margin:0 0 9px}p{margin:7px 0}.muted,small{color:var(--muted)}
+.controls{position:sticky;top:12px}.field{margin:13px 0}.field label{display:block;font-weight:650;margin-bottom:5px}
+input,select,button{font:inherit}input,select{width:100%;border:1px solid #b8c7d7;border-radius:8px;padding:10px;background:#fff;color:var(--ink)}
+input:focus,select:focus,button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+.field small{display:block;margin:3px 0}.field[hidden]{display:none}
+button{border:1px solid #a9bfda;background:#edf4ff;border-radius:8px;color:#154475;padding:8px 10px;cursor:pointer}
+button:hover{background:#dceaff}.presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}.presets span{width:100%;font-size:.87rem;font-weight:650}
+.body{display:grid;gap:16px;min-width:0}.intro{background:#eaf2fb;border-left:4px solid var(--blue);padding:10px 13px;border-radius:7px}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:9px}
+.result{background:#f5f8fc;border:1px solid #e2e9f1;border-radius:9px;padding:10px;min-width:0}
+.result span{display:block;color:var(--muted);font-size:.84rem}.result strong{display:block;font-size:1.1rem;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.badge{padding:6px 10px;border-radius:7px;background:#e7f4ee;color:#105d46;font-weight:650;display:inline-block}
+.warning{background:#fff1df;color:#7d4207}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.chart{min-width:0}.chart svg{display:block;width:100%;height:auto;border-radius:9px;background:#101e2c}
+.schematic{margin:14px 0}.schematic svg{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:9px;background:#f8fbff}
+.legend{font-size:.82rem;color:var(--muted);margin:9px 0 0}
+.swatch{display:inline-block;width:13px;height:3px;vertical-align:middle;margin:0 4px 2px 8px}
+.eq{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f5f8fc;padding:9px;border-radius:7px;margin:6px 0;overflow-wrap:anywhere}
+.note{font-size:.88rem;color:var(--muted)}
+.sweep-scroll{overflow-x:auto}.sweep-scroll svg{min-width:620px}
+.sweep-key{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0}
+.sweep-key label{display:flex;gap:5px;align-items:center;font-size:.88rem;cursor:pointer}
+.sweep-key input{width:auto;accent-color:var(--blue)}
+.sweep-summary{font-size:.9rem;background:#edf4ff;padding:10px 12px;border-radius:8px;margin-top:12px}
+.sweep-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px}
+button:disabled{opacity:.5;cursor:default}
+.scale-controls{background:#f5f8fc;padding:12px;border:1px solid var(--line);border-radius:9px;margin:12px 0}
+.scale-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.scale-grid label{font-size:.82rem;font-weight:600;display:block}.scale-grid input,.scale-grid select{margin-top:4px;padding:7px}
+.author{max-width:1290px;margin:0 auto;padding:0 20px 20px;text-align:right;font-size:.75rem;color:var(--muted)}
+[hidden]{display:none!important}
+.access-gate{max-width:440px;margin:40px auto;padding:24px}
+.access-gate button{margin-top:12px;width:100%}
+.access-error{color:#a52323;min-height:1.4em;font-size:.9rem}
+@media(max-width:850px){main{grid-template-columns:1fr}.controls{position:static}.charts{grid-template-columns:1fr}}
+@media(max-width:450px){main{padding:12px}.card{padding:14px}.result strong{font-size:1rem}}
+</style>
+</head>
+<body>
+<header><a href="../../">← Volver a SIPO</a><h1>Simulador de circuitos RLC serie</h1><p>Explora cómo cambian la intensidad y el desfase al variar R, L, C y la frecuencia.</p></header>
+<section id="accessGate" class="card access-gate" aria-labelledby="accessTitle">
+  <h2 id="accessTitle">Acceso al simulador RLC</h2>
+  <p class="note">Introduce la contraseña para utilizar el simulador.</p>
+  <form id="accessForm">
+    <div class="field"><label for="accessPassword">Contraseña</label><input id="accessPassword" type="password" required autocomplete="current-password" autofocus aria-describedby="accessError"></div>
+    <button type="submit">Entrar</button>
+    <p id="accessError" class="access-error" role="alert"></p>
+  </form>
+  <noscript>Activa JavaScript en tu navegador para utilizar el simulador.</noscript>
+</section>
+<main id="simulatorMain" hidden>
+<aside class="card controls">
+  <h2>Datos de entrada</h2>
+  <div class="field"><label for="type">Circuito</label><select id="type">
+    <option value="R">R</option><option value="L">L</option><option value="C">C</option>
+    <option value="RL">RL</option><option value="RC">RC</option><option value="RLC" selected>RLC serie</option>
+  </select></div>
+  <div class="field"><label for="voltage">Tensión eficaz U (V)</label><input id="voltage" type="number" min="0.001" step="any" value="230"></div>
+  <div class="field"><label for="frequency">Frecuencia f (Hz)</label><input id="frequency" type="number" min="0.001" step="any" value="50"></div>
+  <div class="field" id="rField"><label for="resistance">Resistencia R (Ω)</label><input id="resistance" type="number" min="0.001" step="any" value="100"></div>
+  <div class="field" id="lField"><label for="inductance">Inductancia L (mH)</label><input id="inductance" type="number" min="0.001" step="any" value="500"><small>1 mH = 0,001 H</small></div>
+  <div class="field" id="cField"><label for="capacitance">Capacidad C (µF)</label><input id="capacitance" type="number" min="0.001" step="any" value="20"><small>1 µF = 0,000001 F</small></div>
+  <div class="presets"><span>Probar casos:</span><button type="button" data-preset="ind">Inductivo</button><button type="button" data-preset="cap">Capacitivo</button><button type="button" data-preset="res">Resonancia</button></div>
+  <p class="note">Fuente senoidal ideal y componentes ideales. Todos los valores de U e I mostrados son eficaces, salvo las curvas instantáneas.</p>
+</aside>
+<div class="body">
+  <section class="card"><h2>Montaje y comportamiento</h2><div class="intro">En serie circula la <strong>misma intensidad</strong> por todos los elementos. La tensión de la fuente es la suma <strong>fasorial</strong> de sus tensiones.</div><div class="schematic"><svg id="circuit" viewBox="0 0 760 250" role="img" aria-label="Esquema eléctrico del circuito seleccionado"></svg></div><div id="state" class="badge" role="status"></div><p id="message" class="note"></p></section>
+  <section class="card"><h2>Resultados</h2><div id="results" class="results" aria-live="polite"></div></section>
+  <section class="charts">
+    <div class="card chart"><h2>Diagrama fasorial</h2><svg id="phasors" viewBox="0 0 480 320" role="img" aria-label="Fasores de tensión e intensidad"></svg><p class="legend">Referencia: U horizontal (0°). Longitudes de tensión a escala entre sí; I usa una escala propia. Se representan desde un origen común.</p></div>
+    <div class="card chart"><h2>Ondas instantáneas</h2><svg id="waves" viewBox="0 0 480 320" role="img" aria-label="Ondas de tensión e intensidad durante dos períodos"></svg><p class="legend"><span class="swatch" style="background:#54a9ff"></span>u(t), eje izquierdo en V <span class="swatch" style="background:#ffb24c"></span>i(t), eje derecho en A. Cada onda tiene su propia escala.</p></div>
+  </section>
+  <section class="charts" aria-label="Triángulos de impedancia y potencia">
+    <div class="card chart"><h2>Impedancia y reactancias</h2><svg id="impedance" viewBox="0 0 480 320" role="img" aria-label="Triángulo de impedancias con R, X, Z y vectores X L y X C"></svg><p class="legend">R sobre el eje real, X = Xᴸ − Xᶜ en el eje imaginario y Z como resultante. Xᴸ apunta arriba; Xᶜ, abajo. Todas las longitudes usan la misma escala en Ω.</p></div>
+    <div class="card chart"><h2>Triángulo de potencias</h2><svg id="power" viewBox="0 0 480 320" role="img" aria-label="Triángulo de potencias P, Q y S"></svg><p class="legend">P (W) horizontal; Q (var) positiva arriba si es inductiva y negativa abajo si es capacitiva; S (VA) es la resultante. φ es el ángulo con el eje horizontal.</p></div>
+  </section>
+  <section class="card chart">
+    <h2>Respuesta en frecuencia y resonancia</h2>
+    <p class="note">Se varía la frecuencia manteniendo constantes U, R, L y C. Los puntos señalan los valores del circuito a la frecuencia elegida.</p>
+    <div class="sweep-key">
+      <label><input type="checkbox" data-curve="XL" checked><span class="swatch" style="background:#b990f5"></span>Xᴸ (Ω)</label>
+      <label><input type="checkbox" data-curve="XC" checked><span class="swatch" style="background:#e4a5e5"></span>Xᶜ (Ω)</label>
+      <label><input type="checkbox" data-curve="Z" checked><span class="swatch" style="background:#54a9ff"></span>|Z| (Ω)</label>
+      <label><input type="checkbox" data-curve="I" checked><span class="swatch" style="background:#ffb24c"></span>I eficaz (A)</label>
+    </div>
+    <div class="scale-controls">
+      <h3>Escalas de la gráfica</h3>
+      <div class="scale-grid">
+        <label>Frecuencia mínima (Hz)<input id="plotFMin" type="number" min="0" step="any"></label>
+        <label>Frecuencia máxima (Hz)<input id="plotFMax" type="number" min="0" step="any"></label>
+        <label>Eje de frecuencias<select id="plotFScale"><option value="log">Logarítmico</option><option value="linear">Lineal</option></select></label>
+        <label>Ω mínimo<input id="plotOhmMin" type="number" min="0" step="any"></label>
+        <label>Ω máximo<input id="plotOhmMax" type="number" min="0" step="any"></label>
+        <label>Eje de impedancias<select id="plotOhmScale"><option value="log">Logarítmico</option><option value="linear">Lineal</option></select></label>
+        <label>I mínima (A)<input id="plotIMin" type="number" min="0" step="any"></label>
+        <label>I máxima (A)<input id="plotIMax" type="number" min="0" step="any"></label>
+      </div>
+      <div class="sweep-actions"><button id="applyScales" type="button">Aplicar escalas</button><button id="fitResonance" type="button">Autoajustar a la resonancia</button><button id="fitOverview" type="button">Vista general automática</button></div>
+      <p id="scaleMessage" class="note" role="status"></p>
+    </div>
+    <div class="sweep-scroll"><svg id="frequencyResponse" viewBox="0 0 800 400" role="img" aria-label="Reactancias, módulo de impedancia e intensidad frente a la frecuencia; con marcas de frecuencia actual y resonancia"></svg></div>
+    <p id="scaleLegend" class="legend"></p>
+    <div id="frequencySummary" class="sweep-summary" aria-live="polite"></div>
+    <div class="sweep-actions"><button id="useResonance" type="button">Usar la frecuencia de resonancia actual</button><span class="note">Este botón cambia solo f.</span></div>
+  </section>
+  <section class="card"><h2>Cálculo paso a paso</h2><div id="steps"></div><p class="note">Convenio: φ = arg(Z) = fase de U − fase de I. φ positivo: intensidad retrasada; φ negativo: adelantada.</p></section>
+</div>
+</main>
+<footer class="author">Miguel Estévez Ferreiro</footer>
+<script>
+"use strict";
+const ids = ["type","voltage","frequency","resistance","inductance","capacitance"];
+const el = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+const $ = id => document.getElementById(id);
+$("accessForm").addEventListener("submit",event=>{
+ event.preventDefault();
+ if($("accessPassword").value!=="SIPO_RLC_2026"){
+  $("accessError").textContent="Contraseña incorrecta. Inténtalo de nuevo.";
+  $("accessPassword").value="";$("accessPassword").focus();return;
+ }
+ $("accessPassword").value="";$("accessError").textContent="";
+ $("accessGate").hidden=true;$("simulatorMain").hidden=false;
+ $("type").focus();
+});
+const fmt = (n, digits=3) => Number.isFinite(n) ? new Intl.NumberFormat("es-ES",{maximumFractionDigits:digits}).format(Math.abs(n)<1e-12?0:n) : "—";
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num = (id) => Number(el[id].value);
+const line = (x1,y1,x2,y2,color,width=2) => '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+color+'" stroke-width="'+width+'"/>';
+const text = (x,y,t,color="#bdd0e2",size=12,anchor="start") => '<text x="'+x+'" y="'+y+'" fill="'+color+'" font-size="'+size+'" text-anchor="'+anchor+'" font-family="system-ui,sans-serif">'+esc(t)+'</text>';
+const arrowLine = (x1,y1,x2,y2,color) => {
+ const d=Math.hypot(x2-x1,y2-y1);
+ if(d<.2)return "";
+ const a=Math.atan2(y2-y1,x2-x1), h=Math.min(10,d*.32);
+ return line(x1,y1,x2,y2,color,3)+'<path d="M '+(x2-h*Math.cos(a-.5))+' '+(y2-h*Math.sin(a-.5))+' L '+x2+' '+y2+' L '+(x2-h*Math.cos(a+.5))+' '+(y2-h*Math.sin(a+.5))+'" fill="none" stroke="'+color+'" stroke-width="2"/>';
+};
+function grid() {
+ let s="";
+ for(let x=52;x<=445;x+=39) s+=line(x,25,x,272,"#2c4055",1);
+ for(let y=35;y<=265;y+=38) s+=line(52,y,445,y,"#2c4055",1);
+ return s;
+}
+function phasorSvg(U,I,phi,VR,VL,VC,type){
+ const cx=240,cy=158, max=Math.max(U,VR,VL,VC,1e-12), scale=114/max;
+ let s=grid()+line(45,cy,449,cy,"#688098",1.5)+line(cx,15,cx,299,"#688098",1.5);
+ s+=text(449,cy-5,"Re", "#afc1d2",12,"end")+text(cx+6,23,"Im");
+ function arrow(mag,ang,color,label,ownScale=false){
+  if(mag<1e-12)return;
+  const length=ownScale?105:mag*scale, x=cx+length*Math.cos(ang),y=cy-length*Math.sin(ang);
+  const a=Math.atan2(cy-y,x-cx), tip=10;
+  s+=line(cx,cy,x,y,color,3)+ '<path d="M '+(x-tip*Math.cos(a-.48))+' '+(y+tip*Math.sin(a-.48))+' L '+x+' '+y+' L '+(x-tip*Math.cos(a+.48))+' '+(y+tip*Math.sin(a+.48))+'" fill="none" stroke="'+color+'" stroke-width="2.5"/>';
+  let lx=Math.max(24,Math.min(455,x+12*Math.cos(a))),ly=Math.max(18,Math.min(308,y-11*Math.sin(a)-5));
+  s+=text(lx,ly,label,color,13,lx>420?"end":"start");
+ }
+ // Draw smaller component vectors first. Current has an independent length scale.
+ if(type.includes("L")) arrow(VL,Math.PI/2-phi,"#b990f5","UL");
+ if(type.includes("C")) arrow(VC,-Math.PI/2-phi,"#e4a5e5","UC");
+ if(type.includes("R")) arrow(VR,-phi,"#4ddaaa","UR");
+ arrow(I,-phi,"#ffb24c","I",true);
+ arrow(U,0,"#54a9ff","U");
+ return s;
+}
+function waveSvg(U,I,phi,f){
+ const x0=52,x1=443,y0=150, w=x1-x0, up=102,ip=102;
+ let s=grid()+line(x0,y0,x1,y0,"#8294a6",1.6);
+ for(let k=0;k<=4;k++){let x=x0+k*w/4;s+=line(x,265,x,273,"#aec5d8",1)+text(x,291,k===0?"0":k+"π","#c4d3e3",11,"middle")}
+ s+=text(52,19,"u (V)","#54a9ff")+text(443,19,"i (A)","#ffb24c",12,"end");
+ s+=text(42,y0-up+5,fmt(U*Math.SQRT2,2),"#54a9ff",11,"end")+text(453,y0-ip+5,fmt(I*Math.SQRT2,2),"#ffb24c",11);
+ s+=text(42,y0+up+5,"−"+fmt(U*Math.SQRT2,2),"#54a9ff",11,"end")+text(453,y0+ip+5,"−"+fmt(I*Math.SQRT2,2),"#ffb24c",11);
+ let v="",i="";
+ for(let j=0;j<=360;j++){const x=x0+j*w/360,theta=4*Math.PI*j/360;v+=(j?" L ":"M ")+x.toFixed(2)+" "+(y0-up*Math.sin(theta)).toFixed(2);i+=(j?" L ":"M ")+x.toFixed(2)+" "+(y0-ip*Math.sin(theta-phi)).toFixed(2)}
+ s+='<path d="'+v+'" fill="none" stroke="#54a9ff" stroke-width="2.5"/><path d="'+i+'" fill="none" stroke="#ffb24c" stroke-width="2.5"/>';
+ s+=text(443,310,"2 períodos · T = "+fmt(1000/f,3)+" ms","#bfcddd",11,"end");return s;
+}
+function triangleAxes(originX,originY,rightLabel,unit){
+ let s=grid()+line(44,originY,448,originY,"#8294a6",1.4)+line(originX,20,originX,276,"#8294a6",1.4);
+ s+=text(445,originY-7,rightLabel,"#c3d4e5",11,"end");
+ s+=text(originX+6,27,"+j","#c3d4e5",11)+text(originX+6,273,"−j","#c3d4e5",11);
+ s+=text(440,307,unit,"#bbcede",11,"end");return s;
+}
+function impedanceSvg(R,XL,XC,Z,phi){
+ const ox=75,oy=150,X=XL-XC,scale=Math.min(210/Math.max(R,1e-12),95/Math.max(XL,XC,1e-12));
+ const rx=ox+R*scale, zy=oy-X*scale,rail=385;
+ let s=triangleAxes(ox,oy,"Re (Ω)","R + j(Xᴸ − Xᶜ) = Z");
+ s+=arrowLine(ox,oy,rx,oy,"#4ddaaa")+arrowLine(rx,oy,rx,zy,"#ffb24c")+arrowLine(ox,oy,rx,zy,"#54a9ff");
+ s+=arrowLine(rail,oy,rail,oy-XL*scale,"#b990f5")+arrowLine(rail,oy,rail,oy+XC*scale,"#e4a5e5");
+ if(R>0)s+=text((ox+rx)/2,oy+22,"R = "+fmt(R,2),"#4ddaaa",12,"middle");
+ if(Math.abs(X)>1e-9)s+=text(Math.min(rx+9,345),zy+(X>0?-5:16),"X = "+fmt(X,2),"#ffb24c",11);
+ s+=text(ox+6,Math.max(38,Math.min(267,zy+(X>0?14:-11))),"Z = "+fmt(Z,2)+" Ω","#54a9ff",12);
+ if(XL>0)s+=text(rail-10,Math.max(35,oy-XL*scale/2),"Xᴸ = "+fmt(XL,2),"#b990f5",11,"end");
+ if(XC>0)s+=text(rail-10,Math.min(266,oy+XC*scale/2),"Xᶜ = "+fmt(XC,2),"#e4a5e5",11,"end");
+ s+=text(85,292,"φ = "+fmt(phi*180/Math.PI,2)+"°","#c3d4e5",11);
+ return s;
+}
+function powerSvg(P,Q,S,phi){
+ const ox=79,oy=150,scale=Math.min(235/Math.max(P,1e-12),100/Math.max(Math.abs(Q),1e-12));
+ const px=ox+P*scale,sy=oy-Q*scale;
+ let s=triangleAxes(ox,oy,"P (W)","S² = P² + Q²");
+ s+=arrowLine(ox,oy,px,oy,"#4ddaaa")+arrowLine(px,oy,px,sy,"#ffb24c")+arrowLine(ox,oy,px,sy,"#54a9ff");
+ if(P>0)s+=text((ox+px)/2,oy+22,"P = "+fmt(P,2)+" W","#4ddaaa",12,"middle");
+ if(Math.abs(Q)>1e-9)s+=text(Math.min(px+9,350),sy+(Q>0?-6:17),"Q = "+fmt(Q,2)+" var","#ffb24c",11);
+ s+=text(ox+9,Math.max(36,Math.min(263,sy+(Q>0?18:-10))),"S = "+fmt(S,2)+" VA","#54a9ff",12);
+ s+=text(85,292,"φ = "+fmt(phi*180/Math.PI,2)+"°","#c3d4e5",11);
+ return s;
+}
+function circuitSvg(type,U,f,R,L,C){
+ const selected=[["R",R,"Ω"],["L",L*1000,"mH"],["C",C*1e6,"µF"]].filter(([name])=>type.includes(name));
+ const centers=selected.length===1?[390]:selected.length===2?[310,510]:[245,420,595];
+ const wireColor="#263c55",symbolColor="#146a9c";
+ let s='<g fill="none" stroke="'+wireColor+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">';
+ // A single closed loop. The source and component symbols interrupt the wire.
+ s+='<path d="M 92 96 V 66 M 92 154 V 203 H 686 V 66"/>';
+ let from=92;
+ selected.forEach((entry,k)=>{
+  const cx=centers[k];s+='<path d="M '+from+' 66 H '+(cx-27)+'"/>';from=cx+27;
+  if(entry[0]==="R")s+='<rect x="'+(cx-27)+'" y="54" width="54" height="24" fill="#f8fbff" stroke="'+symbolColor+'"/>';
+  if(entry[0]==="L"){
+   s+='<path stroke="'+symbolColor+'" d="M '+(cx-27)+' 66';
+   for(let j=0;j<4;j++)s+=' Q '+(cx-20.25+j*13.5)+' 42 '+(cx-13.5+j*13.5)+' 66';
+   s+='"/>';
+  }
+  if(entry[0]==="C")s+='<path stroke="'+symbolColor+'" d="M '+(cx-27)+' 66 H '+(cx-9)+' M '+(cx-9)+' 46 V 86 M '+(cx+9)+' 46 V 86 M '+(cx+9)+' 66 H '+(cx+27)+'"/>';
+ });
+ s+='<path d="M '+from+' 66 H 686"/></g>';
+ s+='<circle cx="92" cy="125" r="29" fill="#f8fbff" stroke="'+symbolColor+'" stroke-width="3"/>';
+ s+='<path d="M 73 125 C 79 110 86 110 92 125 S 105 140 111 125" fill="none" stroke="'+symbolColor+'" stroke-width="2.5"/>';
+ s+='<path d="M 142 43 H 191 M 191 43 l -10 -6 M 191 43 l -10 6" fill="none" stroke="#b15c18" stroke-width="2.5" stroke-linecap="round"/>';
+ s+=text(140,34,"I","#99501a",14);
+ s+=text(37,177,"U = "+fmt(U,2)+" V","#263c55",12);
+ s+=text(94,223,"f = "+fmt(f,2)+" Hz","#51677e",12);
+ selected.forEach((entry,k)=>{s+=text(centers[k],30,entry[0],"#146a9c",16,"middle");s+=text(centers[k],111,fmt(entry[1],3)+" "+entry[2],"#263c55",13,"middle")});
+ s+=text(686,225,"Circuito serie · retorno cerrado","#51677e",12,"end");
+ return s;
+}
+function responseAt(f,U,R,L,C){
+ const XL=L?2*Math.PI*f*L:0,XC=C?1/(2*Math.PI*f*C):0;
+ const Z=Math.hypot(R,XL-XC);
+ return {f,XL,XC,Z,I:U/Z};
+}
+let sweepView={bounds:null,xMode:"log",ohmMode:"log"};
+function frequencyPlot(U,f,R,L,C){
+ const f0=L&&C?1/(2*Math.PI*Math.sqrt(L*C)):null;
+ const lo=sweepView.bounds?sweepView.bounds.lo:Math.min(f,f0||f)/5,hi=sweepView.bounds?sweepView.bounds.hi:Math.max(f,f0||f)*5;
+ const logLo=Math.log10(lo),logHi=Math.log10(hi);
+ const frequencies=Array.from({length:601},(_,k)=>sweepView.xMode==="log"?10**(logLo+(logHi-logLo)*k/600):lo+(hi-lo)*k/600);
+ if(f>=lo&&f<=hi)frequencies.push(f);
+ if(f0){
+  if(f0>=lo&&f0<=hi)frequencies.push(f0);
+  // Resolve narrow resonance peaks as well as the broad frequency sweep.
+  const bandwidth=R/(2*Math.PI*L);
+  for(let k=-100;k<=100;k++){
+   const sample=f0+k*bandwidth/20;
+   if(sample>=lo&&sample<=hi)frequencies.push(sample);
+  }
+ }
+ frequencies.sort((a,b)=>a-b);
+ const points=frequencies.map(value=>responseAt(value,U,R,L,C));
+ const curves=[{key:"XL",color:"#b990f5",exists:!!L},{key:"XC",color:"#e4a5e5",exists:!!C},{key:"Z",color:"#54a9ff",exists:true},{key:"I",color:"#ffb24c",exists:true}];
+ const visible=curves.filter(c=>c.exists&&document.querySelector('[data-curve="'+c.key+'"]').checked);
+ const ohms=points.flatMap(p=>visible.filter(c=>c.key!=="I").map(c=>p[c.key]).filter(v=>v>0));
+ if(!ohms.length)ohms.push(...points.map(p=>p.Z));
+ let lowY=Math.floor(Math.log10(Math.min(...ohms))),highY=Math.ceil(Math.log10(Math.max(...ohms)));
+ if(lowY===highY){lowY-=.5;highY+=.5}
+ const manual=sweepView.bounds;
+ const minOhm=manual&&manual.minOhm!==null?manual.minOhm:sweepView.ohmMode==="log"?10**lowY:0;
+ const maxOhm=manual&&manual.maxOhm!==null?manual.maxOhm:sweepView.ohmMode==="log"?10**highY:Math.max(...ohms)*1.08;
+ const minI=manual&&manual.minI!==null?manual.minI:0,maxI=manual&&manual.maxI!==null?manual.maxI:Math.max(...points.map(p=>p.I))*1.08;
+ const left=80,right=707,top=62,bottom=330;
+ const px=value=>left+(sweepView.xMode==="log"?(Math.log10(value)-logLo)/(logHi-logLo):(value-lo)/(hi-lo))*(right-left);
+ const py=value=>bottom-(sweepView.ohmMode==="log"?(Math.log10(value)-Math.log10(minOhm))/(Math.log10(maxOhm)-Math.log10(minOhm)):(value-minOhm)/(maxOhm-minOhm))*(bottom-top);
+ const iy=value=>bottom-(value-minI)/(maxI-minI)*(bottom-top);
+ const tick=value=>value===0?"0":Math.abs(value)>=.01&&Math.abs(value)<1e6?fmt(value,3):value.toExponential(1).replace(".",",");
+ let s='<defs><clipPath id="sweepClip"><rect x="'+left+'" y="'+top+'" width="'+(right-left)+'" height="'+(bottom-top)+'"/></clipPath></defs>';
+ for(let k=0;k<=5;k++){
+  const y=bottom-(bottom-top)*k/5;
+  s+=line(left,y,right,y,"#2c4055",1)+text(right+10,y+4,tick(minI+(maxI-minI)*k/5),"#ffb24c",12);
+ }
+ if(sweepView.ohmMode==="log"){
+  const yStep=Math.max(1,Math.ceil((Math.log10(maxOhm)-Math.log10(minOhm))/7));
+  for(let e=Math.ceil(Math.log10(minOhm));e<=Math.log10(maxOhm);e+=yStep)s+=text(left-12,py(10**e)+4,tick(10**e),"#bdd0e2",12,"end");
+ }else for(let k=0;k<=5;k++)s+=text(left-12,py(minOhm+(maxOhm-minOhm)*k/5)+4,tick(minOhm+(maxOhm-minOhm)*k/5),"#bdd0e2",12,"end");
+ const xTicks=[];
+ if(sweepView.xMode==="linear"){for(let k=0;k<=6;k++)xTicks.push(lo+(hi-lo)*k/6)}
+ else for(let e=Math.floor(logLo);e<=Math.ceil(logHi);e++){
+  for(const factor of [1,2,5]){
+   const v=factor*10**e;
+   if(v>=lo&&v<=hi)xTicks.push(v);
+  }
+ }
+ let lastLabel=-Infinity;
+ for(const value of xTicks){
+  const x=px(value);s+=line(x,top,x,bottom,"#2c4055",1);
+  if(x-lastLabel>56){s+=text(x,bottom+24,tick(value),"#bdd0e2",12,"middle");lastLabel=x}
+ }
+ s+=line(left,top,left,bottom,"#8ba4b9",1.5)+line(left,bottom,right,bottom,"#8ba4b9",1.5)+line(right,top,right,bottom,"#8ba4b9",1.5);
+ s+=text(left,22,"Xᴸ · Xᶜ · |Z| (Ω)","#bdd0e2",13)+text(right+9,22,"I (A)","#ffb24c",13);
+ s+=text((left+right)/2,386,"Frecuencia f (Hz) · escala "+(sweepView.xMode==="log"?"logarítmica":"lineal"),"#bdd0e2",12,"middle");
+ for(const curve of curves){
+  const checkbox=document.querySelector('[data-curve="'+curve.key+'"]');
+  if(!curve.exists||(checkbox&&!checkbox.checked))continue;
+  const getY=curve.key==="I"?iy:py;
+  const path=points.map((p,k)=>(k?"L ":"M ")+px(p.f).toFixed(2)+" "+getY(p[curve.key]).toFixed(2)).join(" ");
+  s+='<path clip-path="url(#sweepClip)" data-series="'+curve.key+'" d="'+path+'" fill="none" stroke="'+curve.color+'" stroke-width="2.5"/>';
+  const current=responseAt(f,U,R,L,C);
+  if(f>=lo&&f<=hi)s+='<circle clip-path="url(#sweepClip)" data-current="'+curve.key+'" cx="'+px(f)+'" cy="'+getY(current[curve.key])+'" r="5" fill="'+curve.color+'" stroke="#101e2c" stroke-width="2"/>';
+ }
+ function marker(value,color,label,y){
+  if(value<lo||value>hi)return;
+  const x=px(value);
+  s+='<line x1="'+x+'" y1="'+top+'" x2="'+x+'" y2="'+bottom+'" stroke="'+color+'" stroke-width="1.5" stroke-dasharray="5 5"/>';
+  s+=text(Math.max(left+4,Math.min(right-4,x)),y,label,color,12,x>(left+right)/2?"end":"start");
+ }
+ if(f0)marker(f0,"#79deb4","f₀ = "+tick(f0)+" Hz",54);
+ marker(f,"#f4f7fb","f actual = "+tick(f)+" Hz",38);
+ const current=responseAt(f,U,R,L,C);
+ let summary="Frecuencia actual: "+tick(f)+" Hz · Xᴸ = "+tick(current.XL)+" Ω · Xᶜ = "+tick(current.XC)+" Ω · |Z| = "+tick(current.Z)+" Ω · I = "+tick(current.I)+" A.";
+ if(f0){
+  const resonant=responseAt(f0,U,R,L,C);
+  const near=Math.abs(f-f0)/f0<1e-8;
+  summary+=" En resonancia: f₀ = "+tick(f0)+" Hz, Xᴸ = Xᶜ = "+tick(resonant.XL)+" Ω, |Z| mínimo = R = "+tick(R)+" Ω e I máxima = U/R = "+tick(U/R)+" A.";
+  summary+=near?" Estás en resonancia.":f<f0?" Estás por debajo de f₀: comportamiento capacitivo.":" Estás por encima de f₀: comportamiento inductivo.";
+ }else summary+=" No hay resonancia serie sin bobina y condensador simultáneamente.";
+ if(f<lo||f>hi)summary+=" La frecuencia actual está fuera del intervalo mostrado.";
+ if(f0&&(f0<lo||f0>hi))summary+=" f₀ está fuera del intervalo mostrado.";
+ return {svg:s,summary,f0,points,bounds:{lo,hi,minOhm,maxOhm,minI,maxI}};
+}
+function update(){
+ const type=el.type.value, hasR=type.includes("R"),hasL=type.includes("L"),hasC=type.includes("C");
+ $("rField").hidden=!hasR;$("lField").hidden=!hasL;$("cField").hidden=!hasC;
+ const U=num("voltage"),f=num("frequency"),R=hasR?num("resistance"):0,L=hasL?num("inductance")/1000:0,C=hasC?num("capacitance")/1e6:0;
+ const invalid=[["U",U],["f",f],...(hasR?[["R",R]]:[]),...(hasL?[["L",L]]:[]),...(hasC?[["C",C]]:[])].find(([key,v])=>!Number.isFinite(v)||v<=0);
+ if(invalid){
+  $("state").className="badge warning";$("state").textContent="Dato no válido";
+  $("message").textContent="Introduce un valor mayor que cero para "+invalid[0]+".";
+  $("circuit").replaceChildren();$("results").replaceChildren();$("steps").replaceChildren();$("phasors").replaceChildren();$("waves").replaceChildren();$("impedance").replaceChildren();$("power").replaceChildren();$("frequencyResponse").replaceChildren();$("frequencySummary").textContent="Introduce datos válidos para dibujar la respuesta en frecuencia.";$("useResonance").disabled=true;return;
+ }
+ $("circuit").innerHTML=circuitSvg(type,U,f,R,L,C);
+ const XL=hasL?2*Math.PI*f*L:0,XC=hasC?1/(2*Math.PI*f*C):0,X=XL-XC,Z=Math.hypot(R,X);
+ if(Z<1e-10){$("state").className="badge warning";$("state").textContent="Impedancia nula en el modelo ideal";$("message").textContent="En resonancia con R = 0, el modelo ideal predice una intensidad ilimitada. Usa un circuito RLC con R > 0.";return}
+ const phi=Math.atan2(X,R),deg=phi*180/Math.PI,I=U/Z,VR=I*R,VL=I*XL,VC=I*XC,P=I*I*R,Q=I*I*X,S=U*I;
+ const kind=X>1e-9?"Inductivo: I retrasada":X< -1e-9?"Capacitivo: I adelantada":"Resistivo o resonante: I y U en fase";
+ $("state").className="badge";$("state").textContent=kind;
+ $("message").textContent=hasL&&hasC?"Frecuencia de resonancia f₀ = "+fmt(1/(2*Math.PI*Math.sqrt(L*C)),3)+" Hz (Xᴸ = Xᶜ).":hasL?"En la bobina ideal, la tensión adelanta 90° a la intensidad.":hasC?"En el condensador ideal, la tensión se retrasa 90° respecto a la intensidad.":"En una resistencia, tensión e intensidad están en fase.";
+ const fields=[
+  ["Xᴸ",fmt(XL)+" Ω"],["Xᶜ",fmt(XC)+" Ω"],["X = Xᴸ − Xᶜ",fmt(X)+" Ω"],
+  ["Z (compleja)",fmt(R)+" "+(X<0?"−":"+")+" j"+fmt(Math.abs(X))+" Ω"],
+  ["|Z|",fmt(Z)+" Ω"],["φ = arg(Z)",fmt(deg,2)+"°"],["I eficaz",fmt(I)+" A"],
+  ["Uᴿ",fmt(VR)+" V"],["Uᴸ",fmt(VL)+" V"],["Uᶜ",fmt(VC)+" V"],
+  ["cos φ",fmt(Math.cos(phi),4)],["P",fmt(P)+" W"],["Q (con signo)",fmt(Q)+" var"],["S",fmt(S)+" VA"]
+ ];
+ $("results").innerHTML=fields.map(([k,v])=>'<div class="result"><span>'+esc(k)+'</span><strong>'+esc(v)+'</strong></div>').join("");
+ const steps=[
+  (hasL?"Xᴸ = 2πfL = "+fmt(XL)+" Ω":"Sin bobina: Xᴸ = 0 Ω")+"; "+(hasC?"Xᶜ = 1/(2πfC) = "+fmt(XC)+" Ω":"sin condensador: Xᶜ = 0 Ω"),
+  "Z = R + j(Xᴸ − Xᶜ) = "+fmt(R)+" "+(X<0?"−":"+")+" j"+fmt(Math.abs(X))+" Ω",
+  "|Z| = √[R² + (Xᴸ − Xᶜ)²] = "+fmt(Z)+" Ω; φ = atan2(Xᴸ − Xᶜ, R) = "+fmt(deg,2)+"°",
+  "I = U/|Z| = "+fmt(I)+" A; Uᴿ = IR = "+fmt(VR)+" V; Uᴸ = IXᴸ = "+fmt(VL)+" V; Uᶜ = IXᶜ = "+fmt(VC)+" V",
+  "U² = (Uᴿ)² + (Uᴸ − Uᶜ)²; P = I²R = "+fmt(P)+" W; Q = I²(Xᴸ − Xᶜ) = "+fmt(Q)+" var; S = UI = "+fmt(S)+" VA"
+ ];
+ $("steps").innerHTML=steps.map(s=>'<div class="eq">'+esc(s)+'</div>').join("");
+ $("phasors").innerHTML=phasorSvg(U,I,phi,VR,VL,VC,type);
+ $("waves").innerHTML=waveSvg(U,I,phi,f);
+ $("impedance").innerHTML=impedanceSvg(R,XL,XC,Z,phi);
+ $("power").innerHTML=powerSvg(P,Q,S,phi);
+ const sweep=frequencyPlot(U,f,R,L,C);
+ $("frequencyResponse").innerHTML=sweep.svg;
+ $("frequencySummary").textContent=sweep.summary;
+ $("useResonance").disabled=!sweep.f0;
+ $("fitResonance").disabled=!sweep.f0;
+ for(const [id,key] of [["plotFMin","lo"],["plotFMax","hi"],["plotOhmMin","minOhm"],["plotOhmMax","maxOhm"],["plotIMin","minI"],["plotIMax","maxI"]])$(id).value=Number(sweep.bounds[key].toPrecision(10));
+ $("plotFScale").value=sweepView.xMode;$("plotOhmScale").value=sweepView.ohmMode;
+ $("scaleLegend").textContent="Frecuencia: escala "+(sweepView.xMode==="log"?"logarítmica":"lineal")+". Ω: escala "+(sweepView.ohmMode==="log"?"logarítmica":"lineal")+". A: escala lineal en el eje derecho. Las curvas que superan los límites se recortan; sus valores no cambian.";
+}
+ids.forEach(id=>el[id].addEventListener(id==="type"?"change":"input",update));
+document.querySelectorAll("[data-curve]").forEach(checkbox=>checkbox.addEventListener("change",update));
+$("applyScales").addEventListener("click",()=>{
+ const values=["plotFMin","plotFMax","plotOhmMin","plotOhmMax","plotIMin","plotIMax"].map(id=>String($(id).value).trim()===""?NaN:Number($(id).value));
+ const [lo,hi,minOhm,maxOhm,minI,maxI]=values;
+ if(values.some(v=>!Number.isFinite(v))||lo<=0||hi<=lo||minOhm<0||maxOhm<=minOhm||minI<0||maxI<=minI||($("plotOhmScale").value==="log"&&minOhm<=0)){
+  $("scaleMessage").textContent="Revisa las escalas: máximo mayor que mínimo, f > 0, amplitudes ≥ 0 y Ω mínimo > 0 en escala logarítmica.";return;
+ }
+ sweepView={bounds:{lo,hi,minOhm,maxOhm,minI,maxI},xMode:$("plotFScale").value,ohmMode:$("plotOhmScale").value};
+ $("scaleMessage").textContent="Escalas manuales aplicadas.";update();
+});
+$("fitOverview").addEventListener("click",()=>{
+ sweepView={bounds:null,xMode:"log",ohmMode:"log"};$("scaleMessage").textContent="Vista general automática: incluye la frecuencia actual y f₀, cuando existe.";update();
+});
+$("fitResonance").addEventListener("click",()=>{
+ if(!el.type.value.includes("L")||!el.type.value.includes("C"))return;
+ const L=num("inductance")/1000,C=num("capacitance")/1e6,R=num("resistance");
+ if(!(L>0&&C>0&&R>0))return;
+ const f0=1/(2*Math.PI*Math.sqrt(L*C)),bandwidth=R/(2*Math.PI*L);
+ const lo=Math.max(f0/10,f0-2*bandwidth),hi=f0+2*bandwidth;
+ sweepView={bounds:{lo,hi,minOhm:null,maxOhm:null,minI:null,maxI:null},xMode:"linear",ohmMode:"linear"};
+ $("scaleMessage").textContent="Autoajuste centrado en f₀: ejes lineales y amplitudes automáticas según las curvas visibles.";update();
+});
+$("useResonance").addEventListener("click",()=>{
+ if(!el.type.value.includes("L")||!el.type.value.includes("C"))return;
+ const f0=1/(2*Math.PI*Math.sqrt(num("inductance")/1000*num("capacitance")/1e6));
+ if(Number.isFinite(f0)&&f0>0){el.frequency.value=f0;update()}
+});
+document.querySelectorAll("[data-preset]").forEach(button=>button.addEventListener("click",()=>{
+ const preset=button.dataset.preset;
+ el.type.value="RLC";el.voltage.value=230;el.frequency.value=50;el.resistance.value=100;
+ el.inductance.value=500;
+ el.capacitance.value=preset==="res"?1e6/((2*Math.PI*50)**2*.5):preset==="ind"?100:10;
+ update();
+}));
+update();
+</script>
+</body>
+</html>
