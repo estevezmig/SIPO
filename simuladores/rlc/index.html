@@ -128,7 +128,7 @@ const el = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
 const $ = id => document.getElementById(id);
 $("accessForm").addEventListener("submit",event=>{
  event.preventDefault();
- if($("accessPassword").value!=="SIPO_RLC_2026"){
+ if($("accessPassword").value!=="SIPO_2026"){
   $("accessError").textContent="Contraseña incorrecta. Inténtalo de nuevo.";
   $("accessPassword").value="";$("accessPassword").focus();return;
  }
