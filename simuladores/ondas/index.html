@@ -73,19 +73,36 @@ main{max-width:1400px;margin:auto;padding:18px}
 .screen-top{margin-bottom:6px}
 .screen-bottom{margin-top:6px}
 .scope-scale-row{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:flex-start;
+  display:grid;
+  grid-template-columns:88px 150px 150px auto;
   align-items:center;
   gap:8px;
   margin-top:8px;
   color:#cbd5e1;
   font-size:.78rem;
 }
+.scope-scale-row > strong{
+  min-width:0;
+}
 .scope-scale-row label{
-  display:flex;
+  display:grid;
+  grid-template-columns:48px 1fr;
   align-items:center;
   gap:6px;
+}
+.scope-scale-row .scope-scale-btn{
+  justify-self:start;
+}
+@media(max-width:700px){
+  .scope-scale-row{
+    grid-template-columns:1fr 1fr;
+  }
+  .scope-scale-row > strong{
+    grid-column:1/-1;
+  }
+  .scope-scale-row .scope-scale-btn{
+    justify-self:start;
+  }
 }
 .scope-scale-row select{
   min-height:34px;
