@@ -72,6 +72,27 @@ main{max-width:1400px;margin:auto;padding:18px}
 }
 .screen-top{margin-bottom:6px}
 .screen-bottom{margin-top:6px}
+.axis-lock-row{
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  margin-top:8px;
+}
+.axis-lock-btn{
+  min-height:34px;
+  padding:6px 10px;
+  border:1px solid #475569;
+  background:#17202a;
+  color:#cbd5e1;
+  border-radius:8px;
+  font-size:.78rem;
+}
+.axis-lock-btn:hover{background:#243244}
+.axis-lock-btn[aria-pressed="true"]{
+  background:#1d4ed8;
+  border-color:#60a5fa;
+  color:#ffffff;
+}
 svg{display:block;width:100%;min-width:640px;height:auto}
 .toolbar{
   margin-top:12px;
@@ -339,6 +360,9 @@ select{padding:7px 10px}
           <span id="scopeInfo">Ventana 40 ms · 1 canal activo</span>
         </div>
         <svg id="plot" viewBox="0 0 820 470" role="img" aria-label="Representación temporal de las ondas con escala angular y temporal"></svg>
+        <div class="axis-lock-row">
+          <button id="lockAmplitudeScale" class="axis-lock-btn" type="button" aria-pressed="false">Bloquear escala de amplitud</button>
+        </div>
         <div class="screen-bottom">
           <span id="readout">CH1: 325 · 50 Hz · 0°</span>
           <span>Tiempo →</span>
@@ -436,6 +460,8 @@ select{padding:7px 10px}
     {enabled:false, amp:325, freq:50, phase:120, kind:'sin'}
   ];
   let active = 0;
+  let yScaleLocked = false;
+  let lockedYmax = null;
 
   const ranges = {
     amp:[0,500,1],
@@ -466,6 +492,22 @@ select{padding:7px 10px}
       freq:clamp(m[3],1,100),
       phase:clamp(m[4] || 0,-180,180)
     };
+  }
+
+  function computeAutoYmax(enabled, sumOn){
+    return Math.max(
+      1,
+      ...enabled.map(s=>Math.abs(s.amp)),
+      sumOn ? enabled.reduce((a,s)=>a+Math.abs(s.amp),0) : 0
+    ) * 1.15;
+  }
+
+  function updateAxisLockButton(){
+    const b = $('#lockAmplitudeScale');
+    b.setAttribute('aria-pressed', yScaleLocked ? 'true' : 'false');
+    b.textContent = yScaleLocked
+      ? 'Desbloquear escala de amplitud'
+      : 'Bloquear escala de amplitud';
   }
 
   function valueAt(s,t){
@@ -594,11 +636,8 @@ select{padding:7px 10px}
     const enabled = states.filter(s=>s.enabled);
     const sumOn = $('#showSum').checked;
 
-    const ymax = Math.max(
-      1,
-      ...enabled.map(s=>Math.abs(s.amp)),
-      sumOn ? enabled.reduce((a,s)=>a+Math.abs(s.amp),0) : 0
-    ) * 1.15;
+    const autoYmax = computeAutoYmax(enabled, sumOn);
+    const ymax = yScaleLocked && lockedYmax !== null ? lockedYmax : autoYmax;
 
     const X = x => l + x/tmax*pw;
     const Y = v => t + ph/2 - v/ymax*(ph/2);
@@ -789,6 +828,19 @@ select{padding:7px 10px}
     draw();
   });
 
+  $('#lockAmplitudeScale').addEventListener('click',()=>{
+    if(yScaleLocked){
+      yScaleLocked=false;
+      lockedYmax=null;
+    }else{
+      const enabled = states.filter(s=>s.enabled);
+      lockedYmax = computeAutoYmax(enabled, $('#showSum').checked);
+      yScaleLocked=true;
+    }
+    updateAxisLockButton();
+    draw();
+  });
+
   $('#timeBase').addEventListener('change',draw);
   $('#showSum').addEventListener('change',draw);
 
@@ -812,9 +864,13 @@ select{padding:7px 10px}
     active=0;
     $('#timeBase').value='40';
     $('#showSum').checked=false;
+    yScaleLocked=false;
+    lockedYmax=null;
+    updateAxisLockButton();
     draw();
   });
 
+  updateAxisLockButton();
   draw();
 })();
 </script>
