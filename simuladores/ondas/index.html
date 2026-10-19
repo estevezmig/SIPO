@@ -373,15 +373,45 @@ select{padding:7px 10px}
         </div>
         <svg id="plot" viewBox="0 0 820 470" role="img" aria-label="Representación temporal de las ondas con escala angular y temporal"></svg>
         <div class="scope-scale-row">
-          <label for="voltsPerDiv">Volt/Div
+          <strong>Volt/Div</strong>
+          <label for="voltsPerDiv">Valor
             <select id="voltsPerDiv">
-              <option value="10">10 V/div</option>
-              <option value="20">20 V/div</option>
-              <option value="50">50 V/div</option>
-              <option value="100" selected>100 V/div</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100" selected>100</option>
+            </select>
+          </label>
+          <label for="voltsUnit">Unidad
+            <select id="voltsUnit">
+              <option value="u">µV</option>
+              <option value="m">mV</option>
+              <option value="v" selected>V</option>
             </select>
           </label>
           <button id="autoAmplitudeScale" class="scope-scale-btn" type="button">Autoajuste</button>
+        </div>
+        <div class="scope-scale-row">
+          <strong>Tiempo/Div</strong>
+          <label for="timePerDiv">Valor
+            <select id="timePerDiv">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="5" selected>5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
+          <label for="timeUnit">Unidad
+            <select id="timeUnit">
+              <option value="u">µs</option>
+              <option value="m" selected>ms</option>
+              <option value="s">s</option>
+            </select>
+          </label>
+          <button id="autoTimeScale" class="scope-scale-btn" type="button">Autoajuste</button>
         </div>
         <div class="screen-bottom">
           <span id="readout">CH1: 325 · 50 Hz · 0°</span>
@@ -438,15 +468,6 @@ select{padding:7px 10px}
 
       <div class="toolbar">
         <label><input id="showSum" type="checkbox"> Mostrar suma</label>
-        <label>Base de tiempos
-          <select id="timeBase">
-            <option value="20">20 ms</option>
-            <option value="40" selected>40 ms</option>
-            <option value="80">80 ms</option>
-            <option value="120">120 ms</option>
-            <option value="200">200 ms</option>
-          </select>
-        </label>
         <button id="threePhase" type="button">Sistema trifásico 50 Hz</button>
         <button id="reset" type="button">Restablecer</button>
       </div>
@@ -512,18 +533,45 @@ select{padding:7px 10px}
     };
   }
 
+  const voltageUnitFactor = unit => unit==='u' ? 1e-6 : unit==='m' ? 1e-3 : 1;
+  const voltageUnitLabel = unit => unit==='u' ? 'µV' : unit==='m' ? 'mV' : 'V';
+  const timeUnitFactor = unit => unit==='u' ? 1e-6 : unit==='m' ? 1e-3 : 1;
+  const timeUnitLabel = unit => unit==='u' ? 'µs' : unit==='m' ? 'ms' : 's';
+
   function autoAdjustVoltsPerDiv(){
     const enabled = states.filter(s=>s.enabled);
     const sumOn = $('#showSum').checked;
     const peak = Math.max(
-      1,
+      1e-9,
       ...enabled.map(s=>Math.abs(s.amp)),
       sumOn ? enabled.reduce((a,s)=>a+Math.abs(s.amp),0) : 0
     );
-    const options = [10,20,50,100];
     const needed = peak/4; // 4 divisiones desde el eje central hasta cada extremo.
-    const chosen = options.find(v=>v>=needed) || options[options.length-1];
-    $('#voltsPerDiv').value = String(chosen);
+    const candidates = [];
+    ['u','m','v'].forEach(unit=>{
+      [10,20,50,100].forEach(value=>{
+        candidates.push({value,unit,actual:value*voltageUnitFactor(unit)});
+      });
+    });
+    candidates.sort((a,b)=>a.actual-b.actual);
+    const chosen = candidates.find(x=>x.actual>=needed) || candidates[candidates.length-1];
+    $('#voltsPerDiv').value = String(chosen.value);
+    $('#voltsUnit').value = chosen.unit;
+  }
+
+  function autoAdjustTimePerDiv(){
+    const s = states[active];
+    const target = (1/Math.max(0.001,s.freq))/5; // ~2 periodos en 10 divisiones.
+    const candidates = [];
+    ['u','m','s'].forEach(unit=>{
+      [1,2,5,10,20,50,100].forEach(value=>{
+        candidates.push({value,unit,actual:value*timeUnitFactor(unit)});
+      });
+    });
+    candidates.sort((a,b)=>a.actual-b.actual);
+    const chosen = candidates.find(x=>x.actual>=target) || candidates[candidates.length-1];
+    $('#timePerDiv').value = String(chosen.value);
+    $('#timeUnit').value = chosen.unit;
   }
 
   function valueAt(s,t){
@@ -647,13 +695,17 @@ select{padding:7px 10px}
 
     const W=820,H=470,l=54,r=18,t=18,b=78;
     const pw=W-l-r, ph=H-t-b;
-    const ms = Number($('#timeBase').value);
-    const tmax = ms/1000;
+    const timePerDiv = Number($('#timePerDiv').value);
+    const tUnit = $('#timeUnit').value;
+    const timePerDivSeconds = timePerDiv * timeUnitFactor(tUnit);
+    const tmax = timePerDivSeconds * 10; // 10 divisiones horizontales.
     const enabled = states.filter(s=>s.enabled);
     const sumOn = $('#showSum').checked;
 
     const voltsPerDiv = Number($('#voltsPerDiv').value);
-    const ymax = voltsPerDiv * 4;
+    const vUnit = $('#voltsUnit').value;
+    const voltsPerDivActual = voltsPerDiv * voltageUnitFactor(vUnit);
+    const ymax = voltsPerDivActual * 4;
 
     const X = x => l + x/tmax*pw;
     const Y = v => t + ph/2 - v/ymax*(ph/2);
@@ -714,7 +766,7 @@ select{padding:7px 10px}
     axisTitle.textContent=`θ = ωt (rad)  ·  t (ms)  ·  referencia CH${active+1}: f=${fmt(fRef,1)} Hz, ω=${fmt(omegaRef,1)} rad/s`;
 
     for(let j=-4;j<=4;j++){
-      const v=voltsPerDiv*j;
+      const v=voltsPerDivActual*j;
       const y=Y(v);
       add('line',{
         x1:l,y1:y,x2:l+pw,y2:y,
@@ -722,7 +774,7 @@ select{padding:7px 10px}
         'stroke-width':j===0?'1.5':'1'
       });
       const ty=add('text',{x:l-8,y:y+4,'text-anchor':'end',fill:'#94a3b8','font-size':'11'});
-      ty.textContent=fmt(v,0);
+      ty.textContent=fmt(voltsPerDiv*j,0);
     }
 
     const n=1000;
@@ -753,7 +805,7 @@ select{padding:7px 10px}
     }
 
     $('#scopeInfo').textContent =
-      `Ventana ${ms} ms · ${voltsPerDiv} V/div · ${enabled.length} canal${enabled.length===1?'':'es'} activo${enabled.length===1?'':'s'}`;
+      `${timePerDiv} ${timeUnitLabel(tUnit)}/div · ${voltsPerDiv} ${voltageUnitLabel(vUnit)}/div · ${enabled.length} canal${enabled.length===1?'':'es'} activo${enabled.length===1?'':'s'}`;
 
     refreshPanel();
     drawPhasor();
@@ -845,13 +897,21 @@ select{padding:7px 10px}
   });
 
   $('#voltsPerDiv').addEventListener('change',draw);
+  $('#voltsUnit').addEventListener('change',draw);
 
   $('#autoAmplitudeScale').addEventListener('click',()=>{
     autoAdjustVoltsPerDiv();
     draw();
   });
 
-  $('#timeBase').addEventListener('change',draw);
+  $('#timePerDiv').addEventListener('change',draw);
+  $('#timeUnit').addEventListener('change',draw);
+
+  $('#autoTimeScale').addEventListener('click',()=>{
+    autoAdjustTimePerDiv();
+    draw();
+  });
+
   $('#showSum').addEventListener('change',draw);
 
   $('#threePhase').addEventListener('click',()=>{
@@ -861,7 +921,8 @@ select{padding:7px 10px}
       });
     });
     active=0;
-    $('#timeBase').value='40';
+    $('#timePerDiv').value='5';
+    $('#timeUnit').value='m';
     draw();
   });
 
@@ -872,9 +933,11 @@ select{padding:7px 10px}
       });
     });
     active=0;
-    $('#timeBase').value='40';
+    $('#timePerDiv').value='5';
+    $('#timeUnit').value='m';
     $('#showSum').checked=false;
     $('#voltsPerDiv').value='100';
+    $('#voltsUnit').value='v';
     draw();
   });
 
