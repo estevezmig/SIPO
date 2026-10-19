@@ -72,13 +72,30 @@ main{max-width:1400px;margin:auto;padding:18px}
 }
 .screen-top{margin-bottom:6px}
 .screen-bottom{margin-top:6px}
-.axis-lock-row{
+.scope-scale-row{
   display:flex;
+  flex-wrap:wrap;
   justify-content:flex-start;
   align-items:center;
+  gap:8px;
   margin-top:8px;
+  color:#cbd5e1;
+  font-size:.78rem;
 }
-.axis-lock-btn{
+.scope-scale-row label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.scope-scale-row select{
+  min-height:34px;
+  padding:5px 8px;
+  border:1px solid #475569;
+  background:#17202a;
+  color:#ffffff;
+  border-radius:8px;
+}
+.scope-scale-btn{
   min-height:34px;
   padding:6px 10px;
   border:1px solid #475569;
@@ -87,12 +104,7 @@ main{max-width:1400px;margin:auto;padding:18px}
   border-radius:8px;
   font-size:.78rem;
 }
-.axis-lock-btn:hover{background:#243244}
-.axis-lock-btn[aria-pressed="true"]{
-  background:#1d4ed8;
-  border-color:#60a5fa;
-  color:#ffffff;
-}
+.scope-scale-btn:hover{background:#243244}
 svg{display:block;width:100%;min-width:640px;height:auto}
 .toolbar{
   margin-top:12px;
@@ -360,8 +372,16 @@ select{padding:7px 10px}
           <span id="scopeInfo">Ventana 40 ms · 1 canal activo</span>
         </div>
         <svg id="plot" viewBox="0 0 820 470" role="img" aria-label="Representación temporal de las ondas con escala angular y temporal"></svg>
-        <div class="axis-lock-row">
-          <button id="lockAmplitudeScale" class="axis-lock-btn" type="button" aria-pressed="false">Bloquear escala de amplitud</button>
+        <div class="scope-scale-row">
+          <label for="voltsPerDiv">Volt/Div
+            <select id="voltsPerDiv">
+              <option value="10">10 V/div</option>
+              <option value="20">20 V/div</option>
+              <option value="50">50 V/div</option>
+              <option value="100" selected>100 V/div</option>
+            </select>
+          </label>
+          <button id="autoAmplitudeScale" class="scope-scale-btn" type="button">Autoajuste</button>
         </div>
         <div class="screen-bottom">
           <span id="readout">CH1: 325 · 50 Hz · 0°</span>
@@ -460,8 +480,6 @@ select{padding:7px 10px}
     {enabled:false, amp:325, freq:50, phase:120, kind:'sin'}
   ];
   let active = 0;
-  let yScaleLocked = false;
-  let lockedYmax = null;
 
   const ranges = {
     amp:[0,500,1],
@@ -494,20 +512,18 @@ select{padding:7px 10px}
     };
   }
 
-  function computeAutoYmax(enabled, sumOn){
-    return Math.max(
+  function autoAdjustVoltsPerDiv(){
+    const enabled = states.filter(s=>s.enabled);
+    const sumOn = $('#showSum').checked;
+    const peak = Math.max(
       1,
       ...enabled.map(s=>Math.abs(s.amp)),
       sumOn ? enabled.reduce((a,s)=>a+Math.abs(s.amp),0) : 0
-    ) * 1.15;
-  }
-
-  function updateAxisLockButton(){
-    const b = $('#lockAmplitudeScale');
-    b.setAttribute('aria-pressed', yScaleLocked ? 'true' : 'false');
-    b.textContent = yScaleLocked
-      ? 'Desbloquear escala de amplitud'
-      : 'Bloquear escala de amplitud';
+    );
+    const options = [10,20,50,100];
+    const needed = peak/4; // 4 divisiones desde el eje central hasta cada extremo.
+    const chosen = options.find(v=>v>=needed) || options[options.length-1];
+    $('#voltsPerDiv').value = String(chosen);
   }
 
   function valueAt(s,t){
@@ -636,8 +652,8 @@ select{padding:7px 10px}
     const enabled = states.filter(s=>s.enabled);
     const sumOn = $('#showSum').checked;
 
-    const autoYmax = computeAutoYmax(enabled, sumOn);
-    const ymax = yScaleLocked && lockedYmax !== null ? lockedYmax : autoYmax;
+    const voltsPerDiv = Number($('#voltsPerDiv').value);
+    const ymax = voltsPerDiv * 4;
 
     const X = x => l + x/tmax*pw;
     const Y = v => t + ph/2 - v/ymax*(ph/2);
@@ -698,7 +714,7 @@ select{padding:7px 10px}
     axisTitle.textContent=`θ = ωt (rad)  ·  t (ms)  ·  referencia CH${active+1}: f=${fmt(fRef,1)} Hz, ω=${fmt(omegaRef,1)} rad/s`;
 
     for(let j=-4;j<=4;j++){
-      const v=ymax*j/4;
+      const v=voltsPerDiv*j;
       const y=Y(v);
       add('line',{
         x1:l,y1:y,x2:l+pw,y2:y,
@@ -737,7 +753,7 @@ select{padding:7px 10px}
     }
 
     $('#scopeInfo').textContent =
-      `Ventana ${ms} ms · ${enabled.length} canal${enabled.length===1?'':'es'} activo${enabled.length===1?'':'s'}`;
+      `Ventana ${ms} ms · ${voltsPerDiv} V/div · ${enabled.length} canal${enabled.length===1?'':'es'} activo${enabled.length===1?'':'s'}`;
 
     refreshPanel();
     drawPhasor();
@@ -828,16 +844,10 @@ select{padding:7px 10px}
     draw();
   });
 
-  $('#lockAmplitudeScale').addEventListener('click',()=>{
-    if(yScaleLocked){
-      yScaleLocked=false;
-      lockedYmax=null;
-    }else{
-      const enabled = states.filter(s=>s.enabled);
-      lockedYmax = computeAutoYmax(enabled, $('#showSum').checked);
-      yScaleLocked=true;
-    }
-    updateAxisLockButton();
+  $('#voltsPerDiv').addEventListener('change',draw);
+
+  $('#autoAmplitudeScale').addEventListener('click',()=>{
+    autoAdjustVoltsPerDiv();
     draw();
   });
 
@@ -864,13 +874,10 @@ select{padding:7px 10px}
     active=0;
     $('#timeBase').value='40';
     $('#showSum').checked=false;
-    yScaleLocked=false;
-    lockedYmax=null;
-    updateAxisLockButton();
+    $('#voltsPerDiv').value='100';
     draw();
   });
 
-  updateAxisLockButton();
   draw();
 })();
 </script>
