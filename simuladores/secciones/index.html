@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cálculo de secciones · SIPO</title>
+<style>
+:root{--bg:#f3f6fa;--ink:#17243a;--muted:#5b6879;--line:#d7e1eb;--navy:#142a44;--blue:#2563eb;--green:#0d9066;--amber:#b86609;--red:#b42318;--soft:#f7f9fc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.48 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--navy);color:#fff;padding:20px max(20px,calc((100vw - 1320px)/2))}header a{color:#bfddff;text-decoration:none;font-size:.9rem}header h1{margin:8px 0 2px;font-size:clamp(1.55rem,3vw,2.1rem)}header p{margin:0;color:#cedbea}
+main{max-width:1360px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(295px,350px) minmax(0,1fr);gap:16px;align-items:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 2px 10px #1a38500a}.controls{position:sticky;top:12px}.body{display:grid;gap:16px;min-width:0}
+h2{font-size:1.15rem;margin:0 0 13px}h3{font-size:1rem;margin:15px 0 7px}p{margin:7px 0}.muted,.note,small{color:var(--muted)}.note{font-size:.88rem}.eyebrow{font-size:.77rem;text-transform:uppercase;letter-spacing:.08em;color:#6a7a8d;font-weight:750;margin:19px 0 7px}.eyebrow:first-child{margin-top:0}
+.field{margin:11px 0}.field label{display:block;font-weight:660;margin-bottom:5px}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.field small{display:block;margin-top:4px}.readout{min-height:42px;border:1px solid #c8d5e2;border-radius:8px;background:#f4f7fb;padding:9px;font-weight:650}.subpanel{border:1px solid var(--line);border-radius:10px;background:#f8fafc;padding:10px 12px;margin-top:9px}.subpanel .field:first-child{margin-top:0}.subpanel .field:last-child{margin-bottom:0}.segment-row{display:grid;grid-template-columns:46px 1fr 1fr 1fr;gap:5px;align-items:end;margin:7px 0}.segment-row>span{padding:9px 0;font-weight:700}.segment-row label{font-size:.72rem;color:var(--muted);display:block}.segment-row input,.segment-row select{padding:7px}
+input,select,button{font:inherit}input,select{width:100%;border:1px solid #b8c7d7;border-radius:8px;padding:9px;background:#fff;color:var(--ink)}input:focus,select:focus,button:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+button{border:1px solid #a9bfda;background:#edf4ff;border-radius:8px;color:#154475;padding:9px 11px;cursor:pointer;font-weight:650}button:hover{background:#dceaff}.preset-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.preset-row button{font-size:.84rem;padding:7px 9px}
+.intro{background:#eaf2fb;border-left:4px solid var(--blue);padding:11px 13px;border-radius:7px}.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:var(--soft);border:1px solid #e2e9f1;border-radius:10px;padding:12px;min-width:0}.metric span{display:block;color:var(--muted);font-size:.8rem}.metric strong{display:block;font-size:1.18rem;margin-top:2px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.verdict{display:flex;align-items:center;gap:12px;padding:15px;border-radius:11px;border:1px solid}.verdict.ok{background:#e9f7f0;border-color:#a9dbc4}.verdict.warn{background:#fff5e8;border-color:#efc48d}.verdict.bad{background:#fff0ef;border-color:#f1b4ae}.verdict-icon{font-size:1.55rem}.verdict strong{display:block}.verdict p{margin:2px 0 0;color:#4e5b6c}
+.criteria{display:grid;gap:9px}.criterion{display:grid;grid-template-columns:minmax(150px,.8fr) minmax(310px,2fr) minmax(145px,.7fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}.criterion.bad{background:#fff0ef;border-color:#f1b4ae}.criterion.ok{background:#f3fbf7;border-color:#b7dfca}.criterion.info{background:#f1f5ff;border-color:#bdccef}.criterion>div{padding:12px;border-right:1px solid var(--line)}.criterion>div:last-child{border-right:0}.criterion-title{font-weight:750}.criterion-number{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#dceaff;color:#174f8d;margin-right:7px}.criterion-formula{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.86rem}.criterion-formula a{color:#175ea8;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.criterion-min{display:block;margin-top:5px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--muted)}.criterion-selected{text-align:center}.criterion-selected strong{display:block;font-size:1.05rem}.status{display:inline-block;border-radius:999px;padding:3px 8px;font-size:.76rem;font-weight:750;margin-top:5px}.status.ok{background:#dcf3e7;color:#096543}.status.bad{background:#fee4e2;color:#a2251c}.status.info{background:#e8efff;color:#2852a1}.eq{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f4f7fb;border-radius:7px;padding:8px 9px;margin:7px 0;overflow-wrap:anywhere;color:#29384e}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.flow div{background:#f4f7fb;border:1px solid var(--line);border-radius:9px;padding:10px;text-align:center;font-size:.84rem}.flow b{display:block;color:var(--blue);font-size:1rem;margin-bottom:2px}
+.choice-panel{display:grid;grid-template-columns:repeat(2,minmax(160px,230px)) auto;gap:10px;align-items:end;margin:14px 0}.choice-panel .field{margin:0}.choice-panel button{height:41px}.method-link{display:inline-block;margin-top:5px;color:#175ea8;font-size:.85rem}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:9px}table{border-collapse:collapse;width:100%;min-width:760px;font-size:.84rem}th,td{padding:8px 9px;border-bottom:1px solid #e5ebf1;text-align:right;white-space:nowrap}th{background:#edf3f9;color:#34465d;position:sticky;top:0;z-index:1}th:first-child,td:first-child{text-align:left}tr:last-child td{border-bottom:0}tr.selected{background:#eaf7f1;font-weight:650}tr.rejected{color:#7b8796}.tag{display:inline-block;border-radius:999px;padding:2px 7px;font-size:.75rem;background:#eef2f6}.tag.ok{background:#dff3e9;color:#0d6949}.tag.bad{background:#fee7e5;color:#9f2b23}.tag.info{background:#e8efff;color:#2852a1}
+details{border-top:1px solid var(--line);padding:11px 0 0;margin-top:11px}details summary{cursor:pointer;font-weight:700}.sources a{color:#175ea8}.author{max-width:1360px;margin:0 auto;padding:0 20px 22px;text-align:right;font-size:.75rem;color:var(--muted)}
+.access-gate{max-width:440px;margin:40px auto;padding:24px}.access-gate button{margin-top:12px;width:100%}.access-error{color:#a52323;min-height:1.4em;font-size:.9rem}[hidden]{display:none!important}
+@media(max-width:950px){main{grid-template-columns:1fr}.controls{position:static}.summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){main{padding:12px}.card{padding:14px}.flow{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.metric strong{font-size:1rem}.criterion{grid-template-columns:1fr}.criterion>div{border-right:0;border-bottom:1px solid var(--line)}.criterion>div:last-child{border-bottom:0}.criterion-selected{text-align:left}.choice-panel{grid-template-columns:1fr 1fr}.choice-panel button{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header><a href="../../">← Volver a SIPO</a><h1>Simulador de cálculo de secciones</h1><p>Dimensiona una línea y justifica cada comprobación según el REBT.</p></header>
+
+<section id="accessGate" class="card access-gate" aria-labelledby="accessTitle">
+  <h2 id="accessTitle">Acceso al simulador</h2>
+  <p class="note">Introduce la contraseña para utilizar el simulador de cálculo de secciones.</p>
+  <form id="accessForm">
+    <div class="field"><label for="accessPassword">Contraseña</label><input id="accessPassword" type="password" required autocomplete="current-password" autofocus aria-describedby="accessError"></div>
+    <button type="submit">Entrar</button>
+    <p id="accessError" class="access-error" role="alert"></p>
+  </form>
+  <noscript>Activa JavaScript en tu navegador para utilizar el simulador.</noscript>
+</section>
+
+<main id="simulatorMain" hidden>
+<aside class="card controls">
+  <h2>Datos de la línea</h2>
+  <p class="eyebrow">1 · Carga y recorrido</p>
+  <div class="field"><label for="system">Sistema</label><select id="system"><option value="mono">Monofásico · 230 V</option><option value="tri">Trifásico equilibrado · 400 V</option></select></div>
+  <div class="field"><label for="loadMode">Dato de partida</label><select id="loadMode"><option value="power">Potencia activa P</option><option value="current">Intensidad de diseño Iᵦ</option></select></div>
+  <div class="two">
+    <div class="field" id="powerField"><label for="power">P (kW)</label><input id="power" type="number" min="0.01" step="any" value="5.75"></div>
+    <div class="field" id="currentField" hidden><label for="current">Iᵦ (A)</label><input id="current" type="number" min="0.01" step="any" value="25"></div>
+    <div class="field"><label for="cosPhi">cos φ</label><input id="cosPhi" type="number" min="0.01" max="1" step="0.01" value="1"></div>
+  </div>
+  <div class="two">
+    <div class="field"><label for="length">Longitud L (m)</label><input id="length" type="number" min="0.1" step="any" value="35"><small>Longitud de ida.</small></div>
+    <div class="field"><label for="dropMode">Límite de caída</label><select id="dropMode"><option value="percent">En porcentaje (%)</option><option value="volts">En valor absoluto (V)</option></select></div>
+  </div>
+  <div class="field"><label id="dropLimitLabel" for="dropLimit">ΔU máxima (%)</label><input id="dropLimit" type="number" min="0.01" max="100" step="0.1" value="3"><small id="dropEquivalent">Equivale a 6,9 V para 230 V.</small></div>
+
+  <p class="eyebrow">2 · Cable e instalación</p>
+  <div class="field"><label for="method">Método de instalación</label><select id="method">
+    <option value="A1">A1 · Conductores en tubo, pared aislante</option><option value="A2">A2 · Cable multiconductor en tubo, pared aislante</option>
+    <option value="B1" selected>B1 · Conductores en tubo o canal</option><option value="B2">B2 · Cable multiconductor en tubo o canal</option>
+    <option value="C">C · Cable fijado sobre pared</option><option value="D1">D1 · Cable multiconductor en conducto enterrado</option><option value="D2">D2 · Cable con cubierta directamente enterrado</option><option value="E">E · Cable multiconductor al aire</option><option value="F">F · Unipolares al aire</option>
+  </select><small id="methodCondition"></small><a class="method-link" href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf#page=10" target="_blank" rel="noopener">Métodos A1–F · Guía-BT-19, tabla B ↗</a><br><a class="method-link" href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Métodos D1–D2 · tabla UNE-HD 60364-5-52 ↗</a></div>
+  <div class="two">
+    <div class="field"><label for="cableDesignation">Designación del cable</label><select id="cableDesignation"></select><small id="designationNote">La designación documenta el cable elegido.</small><a class="method-link" href="https://www.cablesrct.com/descargas/varios/cartel_designacion.pdf" target="_blank" rel="noopener">Consultar designaciones ↗</a></div>
+    <div class="field"><label>Material y conductividad de cálculo</label><div id="conductivityValue" class="readout">Cobre · γ₇₀ = 48 m/(Ω·mm²)</div><small>Se adopta la temperatura máxima permitida por el aislamiento.</small><a class="method-link" href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_anexo_2_sep03R1.pdf#page=4" target="_blank" rel="noopener">Tabla 3 · conductividades Cu/Al a 20, 70 y 90 °C ↗</a></div>
+  </div>
+  <div class="two">
+    <div class="field"><label for="insulation">Aislamiento asociado</label><select id="insulation"><option value="PVC">PVC / Z1 · 70 °C</option><option value="XLPE">XLPE / EPR · 90 °C</option></select><small>Se actualiza al elegir la designación.</small></div>
+    <div class="field"><label for="reactance">x (Ω/km)</label><input id="reactance" type="number" min="0" step="0.001" value="0"><small>Por defecto se desprecia la reactancia.</small></div>
+  </div>
+  <div class="two">
+    <div class="field"><label for="tempFactor">Factor temperatura</label><input id="tempFactor" type="number" min="0.1" max="1.5" step="0.01" value="1"></div>
+    <div class="field"><label for="groupFactor">Factor agrupamiento</label><input id="groupFactor" type="number" min="0.1" max="1" step="0.01" value="1"></div>
+  </div>
+
+  <p class="eyebrow">3 · Protección</p>
+  <div class="field"><label for="protection">Dispositivo</label><select id="protection"><option value="breaker">Magnetotérmico modular</option><option value="fuse">Fusible gG</option></select></div>
+  <div class="two">
+    <div class="field" id="curveField"><label for="curve">Curva</label><select id="curve"><option value="B">B · 3–5 Iₙ</option><option value="C" selected>C · 5–10 Iₙ</option><option value="D">D · 10–20 Iₙ</option></select></div>
+    <div class="field"><label for="role">Función</label><select id="role"><option value="circuit">Protección de circuito</option><option value="iga">IGA</option></select></div>
+  </div>
+  <div class="field"><label for="clearingTime">Tiempo de corte adoptado t (s)</label><input id="clearingTime" type="number" min="0.001" max="5" step="0.001" value="0.01"><small>Para la comprobación térmica adiabática. Debe obtenerse de la protección elegida.</small></div>
+
+  <p class="eyebrow">4 · Cortocircuito en el origen</p>
+  <div class="field"><label for="iccMode">Obtención de la Icc máxima</label><select id="iccMode"><option value="direct">Introducción directa</option><option value="abbreviated">Método abreviado · Guía-BT-Anexo 3</option><option value="transformer">Transformador + línea de alimentación</option></select></div>
+  <div id="directIccFields">
+    <div class="field"><label for="iccMaxOrigin">Icc máxima en la protección (kA)</label><input id="iccMaxOrigin" type="number" min="0.01" step="any" value="6"></div>
+    <p class="note">Dato de la distribuidora, una medición o un cálculo previo.</p>
+  </div>
+  <div id="abbreviatedIccFields" class="subpanel" hidden>
+    <p class="note"><strong>Introduzca las longitudes físicas de ida entre la alimentación y la protección.</strong> El simulador emplea internamente 2L, como el ejemplo oficial de la LGA y la DI.</p>
+    <p class="note">Los valores precargados reproducen el ejemplo oficial: LGA de 25 m y 95 mm² más DI de 15 m y 10 mm², ambas de cobre.</p>
+    <div class="segment-row"><span>Tramo</span><label>Material</label><label>L ida (m)</label><label>S (mm²)</label></div>
+    <div class="segment-row"><span>1</span><select id="abrMaterial1"><option value="Cu">Cu</option><option value="Al">Al</option></select><input id="abrLength1" type="number" min="0" step="any" value="25" aria-label="Longitud tramo 1"><input id="abrSection1" type="number" min="0.1" step="any" value="95" aria-label="Sección tramo 1"></div>
+    <div class="segment-row"><span>2</span><select id="abrMaterial2"><option value="Cu">Cu</option><option value="Al">Al</option></select><input id="abrLength2" type="number" min="0" step="any" value="15" aria-label="Longitud tramo 2"><input id="abrSection2" type="number" min="0.1" step="any" value="10" aria-label="Sección tramo 2"></div>
+    <div class="segment-row"><span>3</span><select id="abrMaterial3"><option value="Cu">Cu</option><option value="Al">Al</option></select><input id="abrLength3" type="number" min="0" step="any" value="0" aria-label="Longitud tramo 3"><input id="abrSection3" type="number" min="0.1" step="any" value="10" aria-label="Sección tramo 3"></div>
+    <div id="abbreviatedIccResult" class="readout"></div>
+    <a class="method-link" href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_anexo_3_sep03R1.pdf#page=1" target="_blank" rel="noopener">Ver el ejemplo oficial resuelto · Guía-BT-Anexo 3 ↗</a>
+  </div>
+  <div id="transformerIccFields" class="subpanel" hidden>
+    <div class="two">
+      <div class="field"><label for="transformerPower">Potencia Sₙ (kVA)</label><input id="transformerPower" type="number" min="1" step="any" value="250"></div>
+      <div class="field"><label for="transformerVoltage">Secundario Uₙ (V)</label><input id="transformerVoltage" type="number" min="1" step="any" value="400"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="transformerUk">Tensión uₖ (%)</label><input id="transformerUk" type="number" min="0.1" step="any" value="4"></div>
+      <div class="field"><label for="transformerPk">Pérdidas Pₖ (W)</label><input id="transformerPk" type="number" min="0" step="any" value="0"><small>0: se considera Zₜ totalmente reactiva.</small></div>
+    </div>
+    <p class="eyebrow">Línea entre transformador y cuadro</p>
+    <div class="two">
+      <div class="field"><label for="supplyLength">Longitud de ida (m)</label><input id="supplyLength" type="number" min="0" step="any" value="20"></div>
+      <div class="field"><label for="supplySection">Sección por conductor (mm²)</label><input id="supplySection" type="number" min="0.1" step="any" value="150"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="supplyMaterial">Material</label><select id="supplyMaterial"><option value="Cu">Cobre</option><option value="Al">Aluminio</option></select></div>
+      <div class="field"><label for="supplyParallels">Conductores en paralelo</label><input id="supplyParallels" type="number" min="1" step="1" value="1"></div>
+    </div>
+    <div class="field"><label for="supplyReactance">Reactancia de la alimentación (Ω/km)</label><input id="supplyReactance" type="number" min="0" step="0.001" value="0.08"></div>
+    <div id="transformerIccResult" class="readout"></div>
+    <p class="note">Modelo didáctico: se supone potencia de cortocircuito infinita en la red de media tensión. En monofásico se considera fase y neutro de igual sección. Sustituya los ejemplos por datos de placa y de la línea real.</p>
+  </div>
+  <div class="field"><label for="iccMinOrigin">Icc mínima en el origen (kA)</label><input id="iccMinOrigin" type="number" min="0.01" step="any" value="3"><small>Dato independiente utilizado para comprobar el disparo al final de la línea.</small></div>
+  <div class="preset-row"><button type="button" data-preset="home">Vivienda</button><button type="button" data-preset="motor">Motor trifásico</button><button type="button" data-preset="long">Línea larga</button></div>
+</aside>
+
+<div class="body">
+  <section class="card"><h2>Cómo decide el simulador</h2><div class="intro">No existe una única fórmula que dé la sección final. Se ensayan las secciones normalizadas y se elige la primera que supera <strong>todas</strong> las comprobaciones aplicables.</div><div class="flow"><div><b>1</b>Caída de tensión</div><div><b>2</b>Intensidad máxima admisible</div><div><b>3</b>Iᵦ ≤ Iₙ ≤ I𝓏</div><div><b>4</b>Cortocircuito</div></div></section>
+  <section class="card"><h2>Comprobaciones</h2><p class="note">Cada fila muestra la sección mínima exigida por ese criterio y comprueba la sección elegida en el apartado siguiente.</p><div id="criteria" class="criteria"></div></section>
+  <section class="card"><h2>Resultado recomendado</h2><div id="verdict" class="verdict" aria-live="polite"></div><div class="choice-panel"><div class="field"><label for="selectedSection">Sección seleccionada</label><select id="selectedSection"></select></div><div class="field"><label for="selectedIn">Calibre Iₙ</label><select id="selectedIn"></select></div><button id="autoChoice" type="button">Restablecer recomendación</button></div><div id="summary" class="summary"></div></section>
+  <section class="card"><h2>Comparación de secciones normalizadas</h2><p class="note">La tabla permite ver por qué se descarta cada sección. I𝓏 ya incluye los factores de corrección introducidos.</p><div class="table-wrap"><table><thead><tr><th>Sección</th><th>I𝓏 (A)</th><th>ΔU</th><th>Protección</th><th>Icc mín. final</th><th>Resultado</th></tr></thead><tbody id="sectionRows"></tbody></table></div></section>
+  <section class="card"><h2>Desarrollo paso a paso</h2><div id="steps"></div></section>
+  <section class="card sources"><h2>Base reglamentaria y alcance</h2>
+    <p>Se emplean la tabla simplificada para cobre no enterrado de la Guía-BT-19, las tablas para métodos enterrados D1/D2 de UNE-HD 60364-5-52, las condiciones de coordinación de la Guía-BT-22 y los criterios de las Guías-BT-Anexos 2 y 3. El resultado es didáctico: un proyecto real debe considerar además las ITC particulares, el conductor de protección y neutro, armónicos, selectividad, arranque, puesta a tierra, condiciones reales del terreno y datos del fabricante.</p>
+    <ul><li><a href="https://www.boe.es/eli/es/rd/2002/08/02/842/con" target="_blank" rel="noopener">REBT consolidado · BOE</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf" target="_blank" rel="noopener">Guía-BT-19 · intensidades y caídas</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_anexo_3_sep03R1.pdf" target="_blank" rel="noopener">Guía-BT-Anexo 3 · método abreviado de cortocircuito</a></li><li><a href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Tabla UNE-HD 60364-5-52 · métodos enterrados D1/D2</a></li><li><a href="https://www.cablesrct.com/descargas/varios/cartel_designacion.pdf" target="_blank" rel="noopener">Tabla de designaciones normalizadas</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_22_oct05R1.pdf" target="_blank" rel="noopener">Guía-BT-22 · sobreintensidades</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Paginas/guia-tecnica-aplicacion.aspx" target="_blank" rel="noopener">Índice oficial de guías y anexos</a></li></ul>
+  </section>
+</div>
+</main>
+<footer class="author">Miguel Estévez Ferreiro</footer>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+$("accessForm").addEventListener("submit",event=>{event.preventDefault();if($("accessPassword").value!=="SIPO_SECCIONES_2026"){$("accessError").textContent="Contraseña incorrecta. Inténtalo de nuevo.";$("accessPassword").value="";$("accessPassword").focus();return;}$("accessPassword").value="";$("accessError").textContent="";$("accessGate").hidden=true;$("simulatorMain").hidden=false;$("system").focus();render();});
+
+const sections=[1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240,300,400,500,630];
+const columns={
+  2:[11,15,20,25,34,45,59,null,null,null,null,null,null,null,null,null,null,null,null],
+  3:[11.5,16,21,27,37,49,64,77,94,null,null,null,null,null,null,null,null,null,null],
+  4:[13,17.5,23,30,40,54,70,86,103,null,null,null,null,null,null,null,null,null,null],
+  5:[13.5,18.5,24,32,44,59,77,96,117,149,180,208,236,268,315,361,431,493,565],
+  6:[15,21,27,36,50,66,84,104,125,160,194,225,260,297,350,401,480,551,632],
+  7:[16,22,30,37,52,70,88,110,133,171,207,240,278,317,374,430,515,592,681],
+  8:[16.5,23,31,40,54,73,95,119,145,185,224,260,299,341,401,461,552,633,728],
+  9:[19,26,34,44,60,81,103,127,155,199,241,280,322,368,435,500,599,687,790],
+  10:[20,26.5,36,46,65,87,110,137,167,214,259,301,343,391,468,538,645,741,853],
+  11:[21,29,38,49,68,91,116,144,175,224,271,314,363,415,490,563,674,774,890],
+  12:[24,33,45,57,76,105,123,154,188,244,296,348,404,464,552,638,770,889,1028],
+  13:[null,null,null,null,null,null,140,174,210,269,327,380,438,500,590,678,812,931,1071]
+};
+const map={A1:{PVC:{tri:3,mono:4},XLPE:{tri:6,mono:7}},A2:{PVC:{tri:2,mono:3},XLPE:{tri:5,mono:6}},B1:{PVC:{tri:5,mono:6},XLPE:{tri:8,mono:10}},B2:{PVC:{tri:4,mono:5},XLPE:{tri:7,mono:8}},C:{PVC:{tri:6,mono:8},XLPE:{tri:9,mono:11}},E:{PVC:{tri:7,mono:9},XLPE:{tri:10,mono:12}},F:{PVC:{tri:8,mono:10},XLPE:{tri:11,mono:13}}};
+const buriedColumns={
+ PVC:{mono:[20,27,36,44,59,76,98,118,140,173,205,233,264,296,342,387,null,null,null],tri:[17,22,29,37,49,63,81,97,115,143,170,192,218,245,282,319,null,null,null]},
+ XLPE:{mono:[24,32,42,53,70,91,116,140,166,204,241,275,311,348,402,455,null,null,null],tri:[21,27,35,44,58,75,96,117,138,170,202,230,260,291,336,380,null,null,null]}
+};
+const designationOptions=[
+ {value:"H07V-K",label:"H07V-K · PVC · 450/750 V",insulation:"PVC",buried:false},
+ {value:"H07Z1-K (AS)",label:"H07Z1-K (AS) · Z1 · 450/750 V",insulation:"PVC",buried:false},
+ {value:"VV-K",label:"VV-K · PVC/PVC · 0,6/1 kV",insulation:"PVC",buried:true},
+ {value:"RV-K",label:"RV-K · XLPE/PVC · 0,6/1 kV",insulation:"XLPE",buried:true},
+ {value:"RZ1-K (AS)",label:"RZ1-K (AS) · XLPE/Z1 · 0,6/1 kV",insulation:"XLPE",buried:true}
+];
+const breakerRatings=[2,4,6,10,13,16,20,25,32,40,50,63,80,100,125];
+const fuseRatings=[2,4,6,10,16,20,25,32,35,40,50,63,80,100,125,160,200,250,315,400,500,630];
+const breakingCaps=[3,4.5,6,10,15,25,36,50];
+const conductorMaterials={Cu:{name:"Cobre",rho20:.018,alpha:.00393,gamma20:55.56},Al:{name:"Aluminio",rho20:.0283,alpha:.00403,gamma20:35.34}};
+const ids=["system","loadMode","power","current","cosPhi","length","dropLimit","method","insulation","reactance","tempFactor","groupFactor","protection","curve","role","clearingTime","iccMode","iccMaxOrigin","iccMinOrigin","abrMaterial1","abrLength1","abrSection1","abrMaterial2","abrLength2","abrSection2","abrMaterial3","abrLength3","abrSection3","transformerPower","transformerVoltage","transformerUk","transformerPk","supplyLength","supplySection","supplyMaterial","supplyParallels","supplyReactance"];
+const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat("es-ES",{maximumFractionDigits:d}).format(Math.abs(n)<1e-10?0:n):"—";
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const val=id=>Number($(id).value);
+let manualSection=null,manualIn=null,lastDropMode="percent";
+
+function fuseI2(inom){return inom>=16?1.6*inom:inom>4?1.9*inom:2.1*inom}
+function isBuried(method){return method==="D1"||method==="D2"}
+function updateDesignationOptions(){
+ const select=$("cableDesignation"),buried=isBuried($("method").value),options=buried?designationOptions.filter(item=>item.buried):designationOptions,current=select.value,requestedInsulation=$("insulation").value;
+ const chosen=options.find(item=>item.value===current&&item.insulation===requestedInsulation)||options.find(item=>item.insulation===requestedInsulation)||options[0];
+ select.innerHTML=options.map(item=>'<option value="'+esc(item.value)+'">'+esc(item.label)+'</option>').join("");select.value=chosen.value;$("insulation").value=chosen.insulation;
+ $("designationNote").textContent=buried?"Para D1/D2 se muestran cables con cubierta de 0,6/1 kV adecuados como punto de partida; confirme la aptitud concreta del fabricante para enterramiento.":"La designación documenta el cable elegido; el cálculo térmico utiliza la familia de aislamiento indicada.";
+}
+function ampacity(section,method,insulation,system,correction){const i=sections.indexOf(section),base=isBuried(method)?buriedColumns[insulation][system][i]:columns[map[method][insulation][system]][i];return base==null?null:base*correction}
+function lineDrop(section,ib,system,u,length,cosPhi,x,iz,insulation,method){
+ const tmax=insulation==="PVC"?70:90,t0=isBuried(method)?25:40,ratio=Math.min(1,ib/iz),estimatedTemp=t0+(tmax-t0)*ratio*ratio,gamma=insulation==="PVC"?48:44,rho=1/gamma;
+ const rKm=rho*1000/section,sinPhi=Math.sqrt(Math.max(0,1-cosPhi*cosPhi));
+ const factor=system==="mono"?2:Math.sqrt(3),drop=factor*(length/1000)*ib*(rKm*cosPhi+x*sinPhi);
+ return{drop,pct:drop/u*100,temp:tmax,estimatedTemp,gamma,rho,rKm,t0};
+}
+function shortCircuit(section,system,u,length,insulation,iccMaxOrigin,iccMinOrigin,clearingTime){
+ const u0=system==="mono"?u:u/Math.sqrt(3),rho20=.018,tmax=insulation==="PVC"?70:90,rhoHot=rho20*(1+.00393*(tmax-20));
+ const rCold=2*rho20*length/section,rHot=2*rhoHot*length/section;
+ const zSourceMax=u0/(iccMaxOrigin*1000),zSourceMin=.8*u0/(iccMinOrigin*1000);
+ const maxEnd=u0/(zSourceMax+rCold),minEnd=.8*u0/(zSourceMin+rHot);
+ const k=insulation==="PVC"?115:143,thermalLimit=k*section/Math.sqrt(clearingTime);
+ return{u0,rCold,rHot,maxEnd,minEnd,thermalLimit,thermalOk:iccMaxOrigin*1000<=thermalLimit};
+}
+function transformerOriginIcc(system){
+ const sn=val("transformerPower")*1000,un=val("transformerVoltage"),uk=val("transformerUk")/100,pk=val("transformerPk"),length=val("supplyLength"),section=val("supplySection"),parallels=Math.max(1,val("supplyParallels")),xKm=val("supplyReactance"),material=conductorMaterials[$("supplyMaterial").value];
+ const zt=uk*un*un/sn,rtRaw=pk*un*un/(sn*sn),rt=Math.min(zt,Math.max(0,rtRaw)),xt=Math.sqrt(Math.max(0,zt*zt-rt*rt));
+ const r20=material.rho20*length/(section*parallels),rHot=r20*(1+material.alpha*(70-20)),xLine=xKm*(length/1000)/parallels,multiplier=system==="mono"?2:1,uPhase=un/Math.sqrt(3);
+ const rMax=rt+multiplier*r20,xMax=xt+multiplier*xLine,rMin=rt+multiplier*rHot,xMin=xt+multiplier*xLine,zMax=Math.hypot(rMax,xMax),zMin=Math.hypot(rMin,xMin);
+ return{maxA:uPhase/zMax,minA:.8*uPhase/zMin,sn,un,uk,zt,rt,xt,r20,rHot,xLine,multiplier,material,pkInvalid:rtRaw>zt};
+}
+function abbreviatedOriginIcc(system){
+ const u0=system==="mono"?230:400/Math.sqrt(3),segments=[1,2,3].map(i=>{const material=$("abrMaterial"+i).value,length=val("abrLength"+i),section=val("abrSection"+i),rho=material==="Cu"?.018:.029;return{material,length,section,rho,resistance:length>0?rho*2*length/section:0}}),resistance=segments.reduce((sum,item)=>sum+item.resistance,0);
+ return{u0,segments,resistance,maxA:resistance>0?.8*u0/resistance:Infinity};
+}
+function evaluateChoice(m,row,inom){
+ if(!row||!row.available||!Number.isFinite(inom))return{dropOk:false,ampOk:false,protectionOk:false,shortOk:false,minTripOk:false,allOk:false,i2:NaN,reasons:["Selección incompleta"]};
+ const i2=m.ptype==="breaker"?1.45*inom:fuseI2(inom),magFactor=m.curve==="B"?5:m.curve==="C"?10:20;
+ const dropOk=row.drop.drop<=m.limitV+1e-9,ampOk=m.ib<=row.iz+1e-9;
+ const protectionOk=m.ib<=inom+1e-9&&inom<=row.iz+1e-9&&i2<=1.45*row.iz+1e-9;
+ const minTripOk=m.ptype==="fuse"?null:row.sc.minEnd>=magFactor*inom;
+ const shortOk=m.breakingOk&&row.sc.thermalOk&&(minTripOk!==false);
+ const reasons=[];if(!dropOk)reasons.push("Caída excesiva");if(!ampOk)reasons.push("Iᵦ > I𝓏");if(m.ib>inom+1e-9)reasons.push("Iₙ < Iᵦ");if(inom>row.iz+1e-9)reasons.push("Iₙ > I𝓏");if(i2>1.45*row.iz+1e-9)reasons.push("I₂/If > 1,45 I𝓏");if(!m.breakingOk)reasons.push("Poder de corte insuficiente");if(!row.sc.thermalOk)reasons.push("No soporta I²t");if(minTripOk===false)reasons.push("Icc mín. insuficiente");
+ return{dropOk,ampOk,protectionOk,shortOk,minTripOk,allOk:dropOk&&ampOk&&protectionOk&&shortOk,i2,magFactor,reasons};
+}
+function model(){
+ const system=$("system").value,u=system==="mono"?230:400,cosPhi=Math.max(.01,Math.min(1,val("cosPhi"))),mode=$("loadMode").value;
+ const ib=mode==="power"?(val("power")*1000)/(system==="mono"?u*cosPhi:Math.sqrt(3)*u*cosPhi):val("current");
+ const power=mode==="power"?val("power"):(system==="mono"?u*ib*cosPhi:Math.sqrt(3)*u*ib*cosPhi)/1000;
+ const dropMode=$("dropMode").value,limitInput=val("dropLimit"),limitV=dropMode==="volts"?limitInput:u*limitInput/100,limitPct=limitV/u*100;
+ const length=val("length"),method=$("method").value,insulation=$("insulation").value,designation=$("cableDesignation").value,x=val("reactance"),correction=val("tempFactor")*val("groupFactor"),ptype=$("protection").value,curve=$("curve").value;
+ const iccMode=$("iccMode").value,sourceCalc=iccMode==="transformer"?transformerOriginIcc(system):null,abbreviatedCalc=iccMode==="abbreviated"?abbreviatedOriginIcc(system):null,maxOrigin=iccMode==="transformer"?sourceCalc.maxA/1000:iccMode==="abbreviated"?abbreviatedCalc.maxA/1000:val("iccMaxOrigin"),minOrigin=val("iccMinOrigin"),time=val("clearingTime"),role=$("role").value;
+ const data=sections.map(section=>{
+  const iz=ampacity(section,method,insulation,system,correction);if(iz==null)return{section,available:false};
+  const drop=lineDrop(section,ib,system,u,length,cosPhi,x,iz,insulation,method),sc=shortCircuit(section,system,u,length,insulation,maxOrigin,minOrigin,time);
+  return{section,available:true,iz,drop,sc,dropOk:drop.drop<=limitV+1e-9,ampOk:ib<=iz+1e-9};
+ });
+ const minBreaking=Math.max(role==="iga"?4.5:0,breakingCaps.find(v=>v>=maxOrigin)??Infinity),breakingOk=Number.isFinite(minBreaking),ratings=ptype==="breaker"?breakerRatings:fuseRatings;
+ const m={system,u,cosPhi,mode,ib,power,dropMode,limitInput,limitV,limitPct,length,method,insulation,designation,x,correction,ptype,curve,iccMode,sourceCalc,abbreviatedCalc,maxOrigin,minOrigin,time,role,data,minBreaking,breakingOk,ratings,auto:null};
+ outer:for(const row of data){if(!row.available)continue;for(const inom of ratings){const ev=evaluateChoice(m,row,inom);if(ev.allOk){m.auto={row,inom,ev};break outer;}}}
+ return m;
+}
+function minimums(m,inom){
+ const drop=m.data.find(r=>r.available&&r.dropOk)||null,amp=m.data.find(r=>r.available&&r.ampOk)||null;
+ const protection=m.ib<=inom+1e-9?(m.data.find(r=>r.available&&evaluateChoice(m,r,inom).protectionOk)||null):null;
+ const short=m.breakingOk?(m.data.find(r=>{if(!r.available||!r.sc.thermalOk)return false;if(m.ptype==="fuse")return true;const factor=m.curve==="B"?5:m.curve==="C"?10:20;return r.sc.minEnd>=factor*inom;})||null):null;
+ return{drop,amp,protection,short};
+}
+function criterionRow(number,title,cls,status,formula,minText,selected){return'<div class="criterion '+cls+'"><div class="criterion-title"><span class="criterion-number">'+number+'</span>'+esc(title)+'</div><div class="criterion-formula">'+formula+'<span class="criterion-min">'+minText+'</span></div><div class="criterion-selected"><span>Sección elegida</span><strong>'+fmt(selected,1)+' mm²</strong><span class="status '+cls+'">'+esc(status)+'</span></div></div>'}
+function renderCriteria(m,row,inom,ev){
+ const mins=minimums(m,inom),minText=r=>r?'Sección mínima requerida: <strong>'+fmt(r.section,1)+' mm²</strong>':'No existe una sección válida en la tabla.',limit=fmt(m.limitV,2)+' V ('+fmt(m.limitPct,2)+' %)';
+ const gamma=row.drop.gamma,powerFactor=m.system==="mono"?2:1,theoreticalDropSection=powerFactor*m.power*1000*m.length/(gamma*m.u*m.limitV);
+ const simplifiedFormula=m.system==="mono"?'S = 2 · P · L / (γ · U · ΔUₘₐₓ)':'S = P · L / (γ · U · ΔUₘₐₓ)';
+ const substitution='S = '+(m.system==="mono"?'2 · ':'')+fmt(m.power*1000,0)+' · '+fmt(m.length,2)+' / ('+fmt(gamma,2)+' · '+fmt(m.u,0)+' · '+fmt(m.limitV,2)+') = <strong>'+fmt(theoreticalDropSection,2)+' mm²</strong>';
+ const reactanceNote=m.x>0?'<br>El cálculo final añade x = '+fmt(m.x,3)+' Ω/km mediante la fórmula completa.':'';
+ const dropFormula=simplifiedFormula+'<br>'+substitution+'<br>γ de cálculo desfavorable = '+fmt(gamma,0)+' m/(Ω·mm²) a '+fmt(row.drop.temp,0)+' °C'+reactanceNote+'<br>ΔU calculada = '+fmt(row.drop.drop,2)+' V ('+fmt(row.drop.pct,2)+' %) ≤ '+limit;
+ let html=criterionRow(1,"Caída de tensión",ev.dropOk?"ok":"bad",ev.dropOk?"Cumple":"No cumple",dropFormula,minText(mins.drop),row.section);
+ const powerRelation=m.system==="mono"?'P = U · Iᵦ · cos φ ⇔ Iᵦ = P / (U · cos φ)':'P = √3 · U · Iᵦ · cos φ ⇔ Iᵦ = P / (√3 · U · cos φ)';
+ const ibValues=m.mode==="power"?'Iᵦ = '+fmt(m.power*1000,0)+' W / '+(m.system==="mono"?'('+fmt(m.u,0)+' V · '+fmt(m.cosPhi,2)+')':'(√3 · '+fmt(m.u,0)+' V · '+fmt(m.cosPhi,2)+')')+' = '+fmt(m.ib,2)+' A':'P calculada = '+fmt(m.power,2)+' kW · Iᵦ introducida = '+fmt(m.ib,2)+' A';
+ const izLink=isBuried(m.method)?'<a href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Consultar tabla I𝓏 D1/D2 (UNE-HD 60364-5-52) ↗</a>':'<a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf#page=9" target="_blank" rel="noopener">Consultar tabla I𝓏 A1–F (Guía-BT-19) ↗</a>';
+ html+=criterionRow(2,"Intensidad máxima admisible",ev.ampOk?"ok":"bad",ev.ampOk?"Cumple":"No cumple",powerRelation+'<br>'+ibValues+'<br>Iᵦ = '+fmt(m.ib,2)+' A ≤ I𝓏 = '+fmt(row.iz,2)+' A<br>'+izLink,minText(mins.amp),row.section);
+ const pMin=m.ib>inom+1e-9?'No es posible: el calibre elegido Iₙ es menor que Iᵦ.':minText(mins.protection);
+ html+=criterionRow(3,"Coordinación con la protección",ev.protectionOk?"ok":"bad",ev.protectionOk?"Cumple":"No cumple",'Iᵦ ≤ Iₙ ≤ I𝓏 &nbsp;·&nbsp; '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(row.iz,2)+' A<br>I₂/If = '+fmt(ev.i2,2)+' A ≤ 1,45 I𝓏 = '+fmt(1.45*row.iz,2)+' A',pMin,row.section);
+ const fusePending=m.ptype==="fuse"&&ev.shortOk,shortCls=fusePending?"info":ev.shortOk?"ok":"bad",shortStatus=fusePending?"Verificar curva":ev.shortOk?"Cumple":"No cumple";
+ const k=m.insulation==="PVC"?115:143,thermalSection=m.maxOrigin*1000*Math.sqrt(m.time)/k;
+ const originKind=m.iccMode==="transformer"?"calculada con transformador":m.iccMode==="abbreviated"?"calculada por método abreviado":"introducida";
+ const shortFormula='<strong>4A · Poder de corte</strong><br>PdC = '+fmt(m.minBreaking,1)+' kA ≥ Icc máx. '+originKind+' = '+fmt(m.maxOrigin,2)+' kA<br><br><strong>4B · Resistencia térmica del cable</strong><br>Icc admisible = k · S / √t = '+fmt(k,0)+' · '+fmt(row.section,1)+' / √'+fmt(m.time,3)+' = '+fmt(row.sc.thermalLimit/1000,2)+' kA<br>S = Icc máx. · √t / k = '+fmt(m.maxOrigin*1000,0)+' · √'+fmt(m.time,3)+' / '+fmt(k,0)+' = <strong>'+fmt(thermalSection,2)+' mm²</strong><br><br><strong>4C · Disparo ante Icc mínima</strong>'+(m.ptype==="breaker"?'<br>Icc mín. final = '+fmt(row.sc.minEnd,0)+' A ≥ Iₐ = '+fmt(ev.magFactor,0)+' · '+fmt(inom,0)+' = '+fmt(ev.magFactor*inom,0)+' A':'<br>Icc mín. final = '+fmt(row.sc.minEnd,0)+' A; comprobar curva del fusible');
+ html+=criterionRow(4,"Cortocircuito",shortCls,shortStatus,shortFormula,minText(mins.short),row.section);$("criteria").innerHTML=html;
+}
+function render(){
+ updateDesignationOptions();
+ $("powerField").hidden=$("loadMode").value!=="power";$("currentField").hidden=$("loadMode").value!=="current";$("curveField").hidden=$("protection").value!=="breaker";$("directIccFields").hidden=$("iccMode").value!=="direct";$("abbreviatedIccFields").hidden=$("iccMode").value!=="abbreviated";$("transformerIccFields").hidden=$("iccMode").value!=="transformer";
+ const m=model(),available=m.data.filter(r=>r.available),auto=m.auto;
+ const chosenSection=available.some(r=>r.section===manualSection)?manualSection:(auto?.row.section??available[0]?.section),chosenIn=m.ratings.includes(manualIn)?manualIn:(auto?.inom??m.ratings.find(n=>n>=m.ib)??m.ratings.at(-1));
+ const row=m.data.find(r=>r.available&&r.section===chosenSection);if(!row)return;
+ const ev=evaluateChoice(m,row,chosenIn),ptype=m.ptype==="breaker"?"magnetotérmico":"fusible gG";
+ $("dropLimitLabel").textContent=m.dropMode==="percent"?"ΔU máxima (%)":"ΔU máxima (V)";$("dropEquivalent").textContent=m.dropMode==="percent"?"Equivale a "+fmt(m.limitV,2)+" V para "+fmt(m.u,0)+" V.":"Equivale al "+fmt(m.limitPct,2)+" % de "+fmt(m.u,0)+" V.";
+ $("methodCondition").textContent=isBuried(m.method)?"Valores base D1/D2: terreno a 25 °C, resistividad térmica 2,5 K·m/W y un solo circuito. Aplique los factores de corrección que correspondan.":"Valores base para cable no enterrado: aire a 40 °C.";
+ $("conductivityValue").textContent="Cobre · γ"+(m.insulation==="PVC"?"₇₀":"₉₀")+" = "+fmt(row.drop.gamma,0)+" m/(Ω·mm²)";
+ if(m.abbreviatedCalc){const a=m.abbreviatedCalc;$("abbreviatedIccResult").innerHTML='R₂₀ = Σ ρ · 2L/S = '+fmt(a.resistance,5)+' Ω<br>Icc máx. = 0,8 · '+fmt(a.u0,1)+' / '+fmt(a.resistance,5)+' = <strong>'+fmt(m.maxOrigin,2)+' kA</strong>';}
+ if(m.sourceCalc){const s=m.sourceCalc,warning=s.pkInvalid?" · Atención: Pₖ es incompatible con uₖ y se ha limitado Rₜ.":"";$("transformerIccResult").innerHTML='Zₜ = '+fmt(s.zt,5)+' Ω · Rₜ = '+fmt(s.rt,5)+' Ω · Xₜ = '+fmt(s.xt,5)+' Ω<br>Icc máxima calculada = <strong>'+fmt(m.maxOrigin,2)+' kA</strong>'+warning;}
+ $("selectedSection").innerHTML=available.map(r=>'<option value="'+r.section+'">'+fmt(r.section,1)+' mm²</option>').join("");$("selectedSection").value=String(chosenSection);
+ $("selectedIn").innerHTML=m.ratings.map(n=>'<option value="'+n+'">'+fmt(n,0)+' A</option>').join("");$("selectedIn").value=String(chosenIn);
+ const isManual=manualSection!=null||manualIn!=null,fusePending=m.ptype==="fuse"&&ev.allOk;
+ if(ev.allOk&&!fusePending){$("verdict").className="verdict ok";$("verdict").innerHTML='<div class="verdict-icon">✓</div><div><strong>'+(isManual?'La selección cumple todos los criterios':'Configuración recomendada')+': '+fmt(row.section,1)+' mm² y '+fmt(chosenIn,0)+' A</strong><p>'+esc(ptype)+(m.ptype==="breaker"?' curva '+m.curve:'')+', con poder de corte mínimo '+fmt(m.minBreaking,1)+' kA.</p></div>'}
+ else if(fusePending){$("verdict").className="verdict warn";$("verdict").innerHTML='<div class="verdict-icon">i</div><div><strong>La selección cumple las comprobaciones calculables</strong><p>Debe verificarse el tiempo de actuación en la curva del fusible gG elegido.</p></div>'}
+ else{$("verdict").className="verdict bad";$("verdict").innerHTML='<div class="verdict-icon">!</div><div><strong>La selección no cumple todos los criterios</strong><p>'+esc(ev.reasons.join(" · ")||"Revise los datos introducidos.")+'</p></div>'}
+ $("summary").innerHTML='<div class="metric"><span>Intensidad de diseño Iᵦ</span><strong>'+fmt(m.ib,2)+' A</strong></div><div class="metric"><span>Caída con '+fmt(row.section,1)+' mm²</span><strong>'+fmt(row.drop.drop,2)+' V · '+fmt(row.drop.pct,2)+' %</strong></div><div class="metric"><span>Intensidad admisible I𝓏</span><strong>'+fmt(row.iz,2)+' A</strong></div><div class="metric"><span>Icc mín. al final</span><strong>'+fmt(row.sc.minEnd/1000,2)+' kA</strong></div><div class="metric"><span>Designación elegida</span><strong>'+esc(m.designation)+'</strong></div>';
+ renderCriteria(m,row,chosenIn,ev);renderRows(m,chosenIn,chosenSection);renderSteps(m,row,chosenIn,ev);
+}
+function renderRows(m,inom,selectedSection){
+ $("sectionRows").innerHTML=m.data.map(r=>{if(!r.available)return'<tr class="rejected"><td>'+fmt(r.section,1)+' mm²</td><td>—</td><td>—</td><td>—</td><td>—</td><td>No contemplada</td></tr>';const ev=evaluateChoice(m,r,inom),cls=r.section===selectedSection?'selected':ev.allOk?'':'rejected';let result=ev.allOk?'<span class="tag ok">Válida</span>':'<span class="tag bad">'+esc(ev.reasons[0]||"Descartada")+'</span>';if(ev.allOk&&m.ptype==="fuse")result='<span class="tag info">Verificar curva</span>';return'<tr class="'+cls+'"><td>'+fmt(r.section,1)+' mm²</td><td>'+fmt(r.iz,1)+'</td><td>'+fmt(r.drop.drop,2)+' V · '+fmt(r.drop.pct,2)+' %</td><td>'+fmt(inom,0)+' A</td><td>'+fmt(r.sc.minEnd/1000,2)+' kA</td><td>'+result+'</td></tr>'}).join("");
+}
+function renderSteps(m,s,inom,ev){
+ const sqrt=m.system==="mono"?"":"√3 · ";
+ const powerFormula=m.system==="mono"?'P = U · Iᵦ · cos φ ⇔ Iᵦ = P/(U · cos φ)':'P = √3 · U · Iᵦ · cos φ ⇔ Iᵦ = P/(√3 · U · cos φ)';
+ let html='<h3>Dato previo · Intensidad de diseño</h3>';
+ html+=m.mode==="power"?'<div class="eq">'+powerFormula+' = '+fmt(m.power*1000,0)+' / ('+sqrt+fmt(m.u,0)+' · '+fmt(m.cosPhi,2)+') = <strong>'+fmt(m.ib,2)+' A</strong></div>':'<p>Se utiliza directamente la intensidad de diseño introducida: <strong>'+fmt(m.ib,2)+' A</strong>.</p>';
+ const gamma=s.drop.gamma,simpleS=(m.system==="mono"?2:1)*m.power*1000*m.length/(gamma*m.u*m.limitV),simpleFormula=m.system==="mono"?'S = 2 · P · L / (γ · U · ΔUₘₐₓ)':'S = P · L / (γ · U · ΔUₘₐₓ)';
+ html+='<h3>1. Caída de tensión</h3><p>Se adopta el valor más desfavorable: γ = '+fmt(gamma,0)+' m/(Ω·mm²) a '+fmt(s.drop.temp,0)+' °C.</p><div class="eq">'+simpleFormula+' = <strong>'+fmt(simpleS,2)+' mm²</strong></div>'+(m.x>0?'<p>Como x = '+fmt(m.x,3)+' Ω/km, el cálculo final incorpora también la componente reactiva.</p>':'')+'<div class="eq">ΔU calculada = <strong>'+fmt(s.drop.drop,3)+' V</strong> = '+fmt(s.drop.pct,3)+' %</div><p>Límite introducido: <strong>'+fmt(m.limitV,2)+' V ('+fmt(m.limitPct,2)+' %)</strong>.</p>';
+ html+='<h3>2. Intensidad máxima admisible</h3><p>Para '+esc(m.method)+', '+esc(m.insulation)+', cable '+esc(m.designation)+', '+(m.system==="mono"?'2':'3')+' conductores cargados y '+fmt(s.section,1)+' mm², la tabla corregida da I𝓏 = <strong>'+fmt(s.iz,2)+' A</strong>.</p><div class="eq">T estimada ≈ '+fmt(s.drop.t0,0)+' + (Tmax − '+fmt(s.drop.t0,0)+') · (Iᵦ/I𝓏)² = '+fmt(s.drop.estimatedTemp,1)+' °C</div>';
+ html+='<h3>3. Coordinación con la protección</h3><div class="eq">'+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(s.iz,2)+' A &nbsp;·&nbsp; '+fmt(ev.i2,2)+' ≤ '+fmt(1.45*s.iz,2)+' A</div>';
+ const sourceExplanation=m.sourceCalc?'<div class="eq">Zₜ = (uₖ/100) · Uₙ²/Sₙ = '+fmt(m.sourceCalc.zt,5)+' Ω<br>Icc máxima calculada en la protección = '+fmt(m.maxOrigin,2)+' kA</div>':m.abbreviatedCalc?'<div class="eq">R₂₀ = Σ ρ · 2L/S = '+fmt(m.abbreviatedCalc.resistance,5)+' Ω<br>Icc máxima = 0,8 · U₀/R₂₀ = '+fmt(m.maxOrigin,2)+' kA</div>':'<p>Icc máxima introducida directamente en el punto de la protección.</p>';
+ html+='<h3>4. Cortocircuitos</h3>'+sourceExplanation+'<p>La Icc mínima en el origen se introduce de forma independiente. En el extremo se añade el bucle completo del circuito, ida y vuelta, con el conductor a su temperatura máxima.</p><div class="eq">R bucle caliente = 2 · ρ · L / S = '+fmt(s.sc.rHot,5)+' Ω</div><div class="eq">Icc mín. final = 0,8 · U₀ / (Z origen + R bucle) = <strong>'+fmt(s.sc.minEnd,0)+' A</strong></div>';
+ if(m.ptype==="breaker")html+='<p>Comprobación conservadora de disparo instantáneo: '+fmt(s.sc.minEnd,0)+' A ≥ '+fmt(ev.magFactor,0)+' · '+fmt(inom,0)+' A = '+fmt(ev.magFactor*inom,0)+' A.</p>';
+ else html+='<p>Con fusible gG, la verificación del tiempo de desconexión requiere la curva tiempo-corriente del modelo elegido.</p>';
+ $("steps").innerHTML=html;
+}
+
+function resetChoice(){manualSection=null;manualIn=null}
+ids.forEach(id=>$(id).addEventListener("input",()=>{resetChoice();render()}));
+$("cableDesignation").addEventListener("change",()=>{const selected=designationOptions.find(item=>item.value===$("cableDesignation").value);if(selected)$("insulation").value=selected.insulation;resetChoice();render()});
+$("dropMode").addEventListener("change",()=>{const u=$("system").value==="mono"?230:400,current=val("dropLimit"),next=$("dropMode").value;if(lastDropMode!==next){$("dropLimit").value=next==="volts"?(current*u/100).toFixed(2):(current/u*100).toFixed(2);lastDropMode=next;}resetChoice();render()});
+$("selectedSection").addEventListener("change",()=>{manualSection=Number($("selectedSection").value);render()});
+$("selectedIn").addEventListener("change",()=>{manualIn=Number($("selectedIn").value);render()});
+$("autoChoice").addEventListener("click",()=>{resetChoice();render()});
+document.querySelectorAll("[data-preset]").forEach(button=>button.addEventListener("click",()=>{const p=button.dataset.preset;$("dropMode").value="percent";$("reactance").value=0;$("iccMode").value="direct";lastDropMode="percent";if(p==="home"){$("system").value="mono";$("loadMode").value="power";$("power").value=5.75;$("cosPhi").value=1;$("length").value=10;$("dropLimit").value=3;$("method").value="B1";$("insulation").value="PVC";$("protection").value="breaker";$("curve").value="C";}if(p==="motor"){$("system").value="tri";$("loadMode").value="power";$("power").value=15;$("cosPhi").value=.82;$("length").value=45;$("dropLimit").value=5;$("method").value="E";$("insulation").value="XLPE";$("protection").value="breaker";$("curve").value="D";}if(p==="long"){$("system").value="mono";$("loadMode").value="current";$("current").value=20;$("cosPhi").value=.9;$("length").value=120;$("dropLimit").value=3;$("method").value="B1";$("insulation").value="PVC";$("protection").value="breaker";$("curve").value="C";}resetChoice();render();}));
+</script>
+</body>
+</html>
