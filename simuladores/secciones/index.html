@@ -64,8 +64,8 @@ details{border-top:1px solid var(--line);padding:11px 0 0;margin-top:11px}detail
     <option value="C">C · Cable fijado sobre pared</option><option value="D1">D1 · Cable multiconductor en conducto enterrado</option><option value="D2">D2 · Cable con cubierta directamente enterrado</option><option value="E">E · Cable multiconductor al aire</option><option value="F">F · Unipolares al aire</option>
   </select><small id="methodCondition"></small><a class="method-link" href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf#page=10" target="_blank" rel="noopener">Métodos A1–F · Guía-BT-19, tabla B ↗</a><br><a class="method-link" href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Métodos D1–D2 · tabla UNE-HD 60364-5-52 ↗</a></div>
   <div class="two">
-    <div class="field"><label for="cableDesignation">Designación del cable</label><select id="cableDesignation"></select><small id="designationNote">La designación documenta el cable elegido.</small><a class="method-link" href="https://www.cablesrct.com/descargas/varios/cartel_designacion.pdf" target="_blank" rel="noopener">Consultar designaciones ↗</a></div>
-    <div class="field"><label>Material y conductividad de cálculo</label><div id="conductivityValue" class="readout">Cobre · γ₇₀ = 48 m/(Ω·mm²)</div><small>Se adopta la temperatura máxima permitida por el aislamiento.</small><a class="method-link" href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_anexo_2_sep03R1.pdf#page=4" target="_blank" rel="noopener">Tabla 3 · conductividades Cu/Al a 20, 70 y 90 °C ↗</a></div>
+    <div class="field"><label for="cableDesignation">Designación del cable</label><select id="cableDesignation"></select><small id="designationNote">La designación documenta el cable elegido.</small><a class="method-link" href="recursos/designaciones-cables.pdf" target="_blank" rel="noopener">Consultar designaciones ↗</a></div>
+    <div class="field"><label for="conductorMaterial">Material del conductor</label><select id="conductorMaterial"><option value="Cu">Cobre (Cu)</option><option value="Al">Aluminio (Al)</option></select><label>Conductividad de cálculo</label><div id="conductivityValue" class="readout">Cobre · γ₇₀ = 48 m/(Ω·mm²)</div><small>Se adopta la temperatura máxima permitida por el aislamiento.</small><a class="method-link" href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_anexo_2_sep03R1.pdf#page=4" target="_blank" rel="noopener">Tabla 3 · conductividades Cu/Al a 20, 70 y 90 °C ↗</a></div>
   </div>
   <div class="two">
     <div class="field"><label for="insulation">Aislamiento asociado</label><select id="insulation"><option value="PVC">PVC / Z1 · 70 °C</option><option value="XLPE">XLPE / EPR · 90 °C</option></select><small>Se actualiza al elegir la designación.</small></div>
@@ -133,8 +133,8 @@ details{border-top:1px solid var(--line);padding:11px 0 0;margin-top:11px}detail
   <section class="card"><h2>Comparación de secciones normalizadas</h2><p class="note">La tabla permite ver por qué se descarta cada sección. I𝓏 ya incluye los factores de corrección introducidos.</p><div class="table-wrap"><table><thead><tr><th>Sección</th><th>I𝓏 (A)</th><th>ΔU</th><th>Protección</th><th>Icc mín. final</th><th>Resultado</th></tr></thead><tbody id="sectionRows"></tbody></table></div></section>
   <section class="card"><h2>Desarrollo paso a paso</h2><div id="steps"></div></section>
   <section class="card sources"><h2>Base reglamentaria y alcance</h2>
-    <p>Se emplean la tabla simplificada para cobre no enterrado de la Guía-BT-19, las tablas para métodos enterrados D1/D2 de UNE-HD 60364-5-52, las condiciones de coordinación de la Guía-BT-22 y los criterios de las Guías-BT-Anexos 2 y 3. El resultado es didáctico: un proyecto real debe considerar además las ITC particulares, el conductor de protección y neutro, armónicos, selectividad, arranque, puesta a tierra, condiciones reales del terreno y datos del fabricante.</p>
-    <ul><li><a href="https://www.boe.es/eli/es/rd/2002/08/02/842/con" target="_blank" rel="noopener">REBT consolidado · BOE</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf" target="_blank" rel="noopener">Guía-BT-19 · intensidades y caídas</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_anexo_3_sep03R1.pdf" target="_blank" rel="noopener">Guía-BT-Anexo 3 · método abreviado de cortocircuito</a></li><li><a href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Tabla UNE-HD 60364-5-52 · métodos enterrados D1/D2</a></li><li><a href="https://www.cablesrct.com/descargas/varios/cartel_designacion.pdf" target="_blank" rel="noopener">Tabla de designaciones normalizadas</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_22_oct05R1.pdf" target="_blank" rel="noopener">Guía-BT-22 · sobreintensidades</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Paginas/guia-tecnica-aplicacion.aspx" target="_blank" rel="noopener">Índice oficial de guías y anexos</a></li></ul>
+    <p>Para aluminio se emplea la tabla del fabricante Miguélez (XLPE, 10–300 mm², aire 40 °C; terreno 25 °C, 2,5 K·m/W, 0,7 m). Se emplean la tabla simplificada para cobre no enterrado de la Guía-BT-19, las tablas para métodos enterrados D1/D2 de UNE-HD 60364-5-52, las condiciones de coordinación de la Guía-BT-22 y los criterios de las Guías-BT-Anexos 2 y 3. El resultado es didáctico: un proyecto real debe considerar además las ITC particulares, el conductor de protección y neutro, armónicos, selectividad, arranque, puesta a tierra, condiciones reales del terreno y datos del fabricante.</p>
+    <ul><li><a href="https://www.boe.es/eli/es/rd/2002/08/02/842/con" target="_blank" rel="noopener">REBT consolidado · BOE</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf" target="_blank" rel="noopener">Guía-BT-19 · intensidades y caídas</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_anexo_3_sep03R1.pdf" target="_blank" rel="noopener">Guía-BT-Anexo 3 · método abreviado de cortocircuito</a></li><li><a href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Tabla UNE-HD 60364-5-52 · métodos enterrados D1/D2</a></li><li><a href="recursos/designaciones-cables.pdf" target="_blank" rel="noopener">Tabla de designaciones normalizadas</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_22_oct05R1.pdf" target="_blank" rel="noopener">Guía-BT-22 · sobreintensidades</a></li><li><a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Paginas/guia-tecnica-aplicacion.aspx" target="_blank" rel="noopener">Índice oficial de guías y anexos</a></li></ul>
   </section>
 </div>
 </main>
@@ -165,6 +165,28 @@ const buriedColumns={
  PVC:{mono:[20,27,36,44,59,76,98,118,140,173,205,233,264,296,342,387,null,null,null],tri:[17,22,29,37,49,63,81,97,115,143,170,192,218,245,282,319,null,null,null]},
  XLPE:{mono:[24,32,42,53,70,91,116,140,166,204,241,275,311,348,402,455,null,null,null],tri:[21,27,35,44,58,75,96,117,138,170,202,230,260,291,336,380,null,null,null]}
 };
+// Miguélez, Intensidades máximas admisibles, primera página, aluminio XLPE.
+// Columnas: A1 2/3, A2 2/3, B1 2/3, B2 2/3, C 2/3, D1 2/3, D2 2/3, E 2/3, F 2/3.
+const alSections=[10,16,25,35,50,70,95,120,150,185,240,300];
+const alRows=[
+ [43,40,40,37,53,47,49,43,56,51,50,41,null,null,60,52,null,null],
+ [58,52,54,50,71,64,65,58,76,69,64,53,69,58,82,70,null,null],
+ [76,69,70,64,95,84,85,76,91,81,81,68,89,74,98,88,110,93],
+ [93,85,87,79,118,105,104,93,114,101,98,81,106,89,122,109,136,117],
+ [113,102,104,94,142,127,125,112,140,123,116,96,126,106,149,132,167,144],
+ [143,129,131,119,182,162,159,141,180,158,143,118,154,131,192,170,215,187],
+ [173,155,159,142,220,197,191,171,219,192,169,140,185,156,233,206,262,230],
+ [200,179,182,163,255,228,220,196,254,222,192,158,212,179,273,239,306,269],
+ [230,205,209,187,279,242,237,218,294,257,216,179,237,200,314,276,353,312],
+ [262,232,238,212,319,273,273,247,337,293,242,200,269,227,361,315,406,359],
+ [307,273,279,248,374,319,325,289,399,347,279,230,312,263,427,372,482,428],
+ [352,313,320,284,428,365,377,331,462,400,314,260,351,296,494,428,557,497]
+];
+const alMethods={A1:0,A2:2,B1:4,B2:6,C:8,D1:10,D2:12,E:14,F:16};
+const alDesignationOptions=[
+ {value:"RV (Al)",label:"RV (Al) · XLPE/PVC · 0,6/1 kV",insulation:"XLPE",buried:true},
+ {value:"RZ1 (Al) (AS)",label:"RZ1 (Al) (AS) · XLPE/Z1 · 0,6/1 kV",insulation:"XLPE",buried:true}
+];
 const designationOptions=[
  {value:"H07V-K",label:"H07V-K · PVC · 450/750 V",insulation:"PVC",buried:false},
  {value:"H07Z1-K (AS)",label:"H07Z1-K (AS) · Z1 · 450/750 V",insulation:"PVC",buried:false},
@@ -177,7 +199,7 @@ const breakerRatings=[2,4,6,10,13,16,20,25,32,40,50,63,80,100,125];
 const fuseRatings=[2,4,6,10,16,20,25,32,35,40,50,63,80,100,125,160,200,250,315,400,500,630];
 const breakingCaps=[3,4.5,6,10,15,25,36,50];
 const conductorMaterials={Cu:{name:"Cobre",rho20:.018,alpha:.00393,gamma20:55.56},Al:{name:"Aluminio",rho20:.0283,alpha:.00403,gamma20:35.34}};
-const ids=["system","loadMode","power","current","cosPhi","length","dropLimit","method","insulation","reactance","tempFactor","groupFactor","protection","curve","role","clearingTime","iccMode","iccMaxOrigin","iccMinOrigin","abrMaterial1","abrLength1","abrSection1","abrMaterial2","abrLength2","abrSection2","abrMaterial3","abrLength3","abrSection3","transformerPower","transformerVoltage","transformerUk","transformerPk","supplyLength","supplySection","supplyMaterial","supplyParallels","supplyReactance"];
+const ids=["conductorMaterial","system","loadMode","power","current","cosPhi","length","dropLimit","method","insulation","reactance","tempFactor","groupFactor","protection","curve","role","clearingTime","iccMode","iccMaxOrigin","iccMinOrigin","abrMaterial1","abrLength1","abrSection1","abrMaterial2","abrLength2","abrSection2","abrMaterial3","abrLength3","abrSection3","transformerPower","transformerVoltage","transformerUk","transformerPk","supplyLength","supplySection","supplyMaterial","supplyParallels","supplyReactance"];
 const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat("es-ES",{maximumFractionDigits:d}).format(Math.abs(n)<1e-10?0:n):"—";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const val=id=>Number($(id).value);
@@ -186,25 +208,25 @@ let manualSection=null,manualIn=null,lastDropMode="percent";
 function fuseI2(inom){return inom>=16?1.6*inom:inom>4?1.9*inom:2.1*inom}
 function isBuried(method){return method==="D1"||method==="D2"}
 function updateDesignationOptions(){
- const select=$("cableDesignation"),buried=isBuried($("method").value),options=buried?designationOptions.filter(item=>item.buried):designationOptions,current=select.value,requestedInsulation=$("insulation").value;
+ const select=$("cableDesignation"),buried=isBuried($("method").value),available=$("conductorMaterial").value==="Al"?alDesignationOptions:designationOptions,options=buried?available.filter(item=>item.buried):available,current=select.value,requestedInsulation=$("insulation").value;
  const chosen=options.find(item=>item.value===current&&item.insulation===requestedInsulation)||options.find(item=>item.insulation===requestedInsulation)||options[0];
  select.innerHTML=options.map(item=>'<option value="'+esc(item.value)+'">'+esc(item.label)+'</option>').join("");select.value=chosen.value;$("insulation").value=chosen.insulation;
- $("designationNote").textContent=buried?"Para D1/D2 se muestran cables con cubierta de 0,6/1 kV adecuados como punto de partida; confirme la aptitud concreta del fabricante para enterramiento.":"La designación documenta el cable elegido; el cálculo térmico utiliza la familia de aislamiento indicada.";
+ $("designationNote").textContent=buried?"Para D1/D2 se muestran cables con cubierta de 0,6/1 kV adecuados como punto de partida; confirme la aptitud concreta del fabricante para enterramiento.":"La designación documenta el cable elegido; confirme su aptitud con el fabricante. Aluminio: solo XLPE de 90 °C, secciones de 10 a 300 mm² y métodos con datos tabulados; no se extrapolan intensidades.";
 }
-function ampacity(section,method,insulation,system,correction){const i=sections.indexOf(section),base=isBuried(method)?buriedColumns[insulation][system][i]:columns[map[method][insulation][system]][i];return base==null?null:base*correction}
+function ampacity(section,method,insulation,system,correction){if($("conductorMaterial").value==="Al"){const i=alSections.indexOf(section);if(i<0||insulation!=="XLPE")return null;const base=alRows[i][alMethods[method]+(system==="tri"?1:0)];return base==null?null:base*correction}const i=sections.indexOf(section),base=isBuried(method)?buriedColumns[insulation][system][i]:columns[map[method][insulation][system]][i];return base==null?null:base*correction}
 function lineDrop(section,ib,system,u,length,cosPhi,x,iz,insulation,method){
- const tmax=insulation==="PVC"?70:90,t0=isBuried(method)?25:40,ratio=Math.min(1,ib/iz),estimatedTemp=t0+(tmax-t0)*ratio*ratio,gamma=insulation==="PVC"?48:44,rho=1/gamma;
+ const tmax=insulation==="PVC"?70:90,t0=isBuried(method)?25:40,ratio=Math.min(1,ib/iz),estimatedTemp=t0+(tmax-t0)*ratio*ratio,gamma=$("conductorMaterial").value==="Al"?(insulation==="PVC"?30:28):(insulation==="PVC"?48:44),rho=1/gamma;
  const rKm=rho*1000/section,sinPhi=Math.sqrt(Math.max(0,1-cosPhi*cosPhi));
  const factor=system==="mono"?2:Math.sqrt(3),drop=factor*(length/1000)*ib*(rKm*cosPhi+x*sinPhi);
  return{drop,pct:drop/u*100,temp:tmax,estimatedTemp,gamma,rho,rKm,t0};
 }
 function shortCircuit(section,system,u,length,insulation,iccMaxOrigin,iccMinOrigin,clearingTime){
- const u0=system==="mono"?u:u/Math.sqrt(3),rho20=.018,tmax=insulation==="PVC"?70:90,rhoHot=rho20*(1+.00393*(tmax-20));
+ const u0=system==="mono"?u:u/Math.sqrt(3),material=conductorMaterials[$("conductorMaterial").value],rho20=material.rho20,alpha=material.alpha,tmax=insulation==="PVC"?70:90,rhoHot=rho20*(1+alpha*(tmax-20));
  const rCold=2*rho20*length/section,rHot=2*rhoHot*length/section;
  const zSourceMax=u0/(iccMaxOrigin*1000),zSourceMin=.8*u0/(iccMinOrigin*1000);
  const maxEnd=u0/(zSourceMax+rCold),minEnd=.8*u0/(zSourceMin+rHot);
- const k=insulation==="PVC"?115:143,thermalLimit=k*section/Math.sqrt(clearingTime);
- return{u0,rho20,rhoHot,tmax,zSourceMax,zSourceMin,rCold,rHot,maxEnd,minEnd,thermalLimit,thermalOk:iccMaxOrigin*1000<=thermalLimit};
+ const k=$("conductorMaterial").value==="Al"?(insulation==="PVC"?76:94):(insulation==="PVC"?115:143),thermalLimit=k*section/Math.sqrt(clearingTime);
+ return{u0,k,alpha,rho20,rhoHot,tmax,zSourceMax,zSourceMin,rCold,rHot,maxEnd,minEnd,thermalLimit,thermalOk:iccMaxOrigin*1000<=thermalLimit};
 }
 function transformerOriginIcc(system){
  const sn=val("transformerPower")*1000,un=val("transformerVoltage"),uk=val("transformerUk")/100,pk=val("transformerPk"),length=val("supplyLength"),section=val("supplySection"),parallels=Math.max(1,val("supplyParallels")),xKm=val("supplyReactance"),material=conductorMaterials[$("supplyMaterial").value];
@@ -261,7 +283,7 @@ function renderCriteria(m,row,inom,ev){
  let html=criterionRow(1,"Caída de tensión",ev.dropOk?"ok":"bad",ev.dropOk?"Cumple":"No cumple",dropFormula,minText(mins.drop),row.section);
  const powerRelation=m.system==="mono"?'P = U · Iᵦ · cos φ ⇔ Iᵦ = P / (U · cos φ)':'P = √3 · U · Iᵦ · cos φ ⇔ Iᵦ = P / (√3 · U · cos φ)';
  const ibValues=m.mode==="power"?'Iᵦ = '+fmt(m.power*1000,0)+' W / '+(m.system==="mono"?'('+fmt(m.u,0)+' V · '+fmt(m.cosPhi,2)+')':'(√3 · '+fmt(m.u,0)+' V · '+fmt(m.cosPhi,2)+')')+' = '+fmt(m.ib,2)+' A':'P calculada = '+fmt(m.power,2)+' kW · Iᵦ introducida = '+fmt(m.ib,2)+' A';
- const izLink=isBuried(m.method)?'<a href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Consultar tabla I𝓏 D1/D2 (UNE-HD 60364-5-52) ↗</a>':'<a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf#page=9" target="_blank" rel="noopener">Consultar tabla I𝓏 A1–F (Guía-BT-19) ↗</a>';
+ const izLink=($("conductorMaterial").value==="Al"||isBuried(m.method))?'<a href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Consultar tabla I𝓏 del fabricante (Cu/Al) ↗</a>':'<a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf#page=9" target="_blank" rel="noopener">Consultar tabla I𝓏 A1–F (Guía-BT-19) ↗</a>';
  const minAmpText=mins.amp?'Sección mínima requerida: <strong>'+fmt(mins.amp.section,1)+' mm²</strong> (I𝓏 = <strong>'+fmt(mins.amp.iz,2)+' A</strong>)':'No existe una sección válida en la tabla.';
  html+=criterionRow(2,"Intensidad máxima admisible",ev.ampOk?"ok":"bad",ev.ampOk?"Cumple":"No cumple",powerRelation+'<br>'+ibValues+'<br>Iᵦ = '+fmt(m.ib,2)+' A ≤ I𝓏 = '+fmt(row.iz,2)+' A<br>'+izLink,minAmpText,row.section);
  const pMin=m.ib>inom+1e-9?'No es posible: el calibre elegido Iₙ es menor que Iᵦ.':minText(mins.protection);
@@ -270,9 +292,9 @@ function renderCriteria(m,row,inom,ev){
   :'Iᵦ ≤ Iₙ ≤ I𝓏 &nbsp;·&nbsp; '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(row.iz,2)+' A<br>I<sub>f</sub> = '+fmt(ev.i2/inom,1)+' · Iₙ = '+fmt(ev.i2/inom,1)+' · '+fmt(inom,0)+' = '+fmt(ev.i2,2)+' A ≤ 1,45 · I𝓏 = '+fmt(1.45*row.iz,2)+' A';
  html+=criterionRow(3,"Coordinación con la protección",ev.protectionOk?"ok":"bad",ev.protectionOk?"Cumple":"No cumple",protectionFormula,pMin,row.section);
  const fusePending=m.ptype==="fuse"&&ev.shortOk,shortCls=fusePending?"info":ev.shortOk?"ok":"bad",shortStatus=fusePending?"Verificar curva":ev.shortOk?"Cumple":"No cumple";
- const k=m.insulation==="PVC"?115:143,thermalSection=m.maxOrigin*1000*Math.sqrt(m.time)/k;
+ const k=row.sc.k,thermalSection=m.maxOrigin*1000*Math.sqrt(m.time)/k;
  const originKind=m.iccMode==="transformer"?"calculada con transformador":m.iccMode==="abbreviated"?"calculada por método abreviado":"introducida";
- const shortFormula='<strong>4A · Poder de corte</strong><br>PdC = '+fmt(m.minBreaking,1)+' kA ≥ Icc máx. '+originKind+' = '+fmt(m.maxOrigin,2)+' kA<br><br><strong>4B · Resistencia térmica del cable</strong><br>Icc admisible = k · S / √t = '+fmt(k,0)+' · '+fmt(row.section,1)+' / √'+fmt(m.time,3)+' = '+fmt(row.sc.thermalLimit/1000,2)+' kA<br>S = Icc máx. · √t / k = '+fmt(m.maxOrigin*1000,0)+' · √'+fmt(m.time,3)+' / '+fmt(k,0)+' = <strong>'+fmt(thermalSection,2)+' mm²</strong><br><br><strong>4C · Disparo ante Icc mínima</strong>'+(m.ptype==="breaker"?'<br>Icc mín. final = '+fmt(row.sc.minEnd,0)+' A ≥ Iₐ = '+fmt(ev.magFactor,0)+' · '+fmt(inom,0)+' = '+fmt(ev.magFactor*inom,0)+' A':'<br>Icc mín. final = '+fmt(row.sc.minEnd,0)+' A; comprobar curva del fusible');
+ const shortFormula='<strong>4A · Poder de corte</strong><br>PdC = '+fmt(m.minBreaking,1)+' kA ≥ Icc máx. '+originKind+' = '+fmt(m.maxOrigin,2)+' kA<br><br><strong>4B · Resistencia térmica del cable</strong><br>Icc admisible = k · S / √t = '+fmt(k,0)+' · '+fmt(row.section,1)+' / √'+fmt(m.time,3)+' = '+fmt(row.sc.thermalLimit/1000,2)+' kA<br>S = Icc máx. · √t / k = '+fmt(m.maxOrigin*1000,0)+' · √'+fmt(m.time,3)+' / '+fmt(k,0)+' = <strong>'+fmt(thermalSection,2)+' mm²</strong><br><br><strong>4C · Disparo ante Icc mínima</strong>'+(m.ptype==="breaker"?'<br>Icc mín. final = '+fmt(row.sc.minEnd,0)+' A ≥ Iₐ = '+fmt(ev.magFactor,0)+' · '+fmt(inom,0)+' = '+fmt(ev.magFactor*inom,0)+' A':'<br>Icc mín. final = '+fmt(row.sc.minEnd,0)+' A; comprobar curva del fusible')+'<br><a href="recursos/curvas-protecciones.pdf#page=1" target="_blank" rel="noopener">Consultar curvas de magnetotérmicos y fusibles ↗</a>';
  html+=criterionRow(4,"Cortocircuito",shortCls,shortStatus,shortFormula,minText(mins.short),row.section);$("criteria").innerHTML=html;
 }
 function render(){
@@ -284,7 +306,7 @@ function render(){
  const ev=evaluateChoice(m,row,chosenIn),ptype=m.ptype==="breaker"?"magnetotérmico":"fusible gG";
  $("dropLimitLabel").textContent=m.dropMode==="percent"?"ΔU máxima (%)":"ΔU máxima (V)";$("dropEquivalent").textContent=m.dropMode==="percent"?"Equivale a "+fmt(m.limitV,2)+" V para "+fmt(m.u,0)+" V.":"Equivale al "+fmt(m.limitPct,2)+" % de "+fmt(m.u,0)+" V.";
  $("methodCondition").textContent=isBuried(m.method)?"Valores base D1/D2: terreno a 25 °C, resistividad térmica 2,5 K·m/W y un solo circuito. Aplique los factores de corrección que correspondan.":"Valores base para cable no enterrado: aire a 40 °C.";
- $("conductivityValue").textContent="Cobre · γ"+(m.insulation==="PVC"?"₇₀":"₉₀")+" = "+fmt(row.drop.gamma,0)+" m/(Ω·mm²)";
+ $("conductivityValue").textContent=conductorMaterials[$("conductorMaterial").value].name+" · γ"+(m.insulation==="PVC"?"₇₀":"₉₀")+" = "+fmt(row.drop.gamma,0)+" m/(Ω·mm²)";
  if(m.abbreviatedCalc){const a=m.abbreviatedCalc;$("abbreviatedIccResult").innerHTML='R₂₀ = Σ ρ · 2L/S = '+fmt(a.resistance,5)+' Ω<br>Icc máx. = 0,8 · '+fmt(a.u0,1)+' / '+fmt(a.resistance,5)+' = <strong>'+fmt(m.maxOrigin,2)+' kA</strong>';}
  if(m.sourceCalc){const s=m.sourceCalc,warning=s.pkInvalid?" · Atención: Pₖ es incompatible con uₖ y se ha limitado Rₜ.":"";$("transformerIccResult").innerHTML='Zₜ = '+fmt(s.zt,5)+' Ω · Rₜ = '+fmt(s.rt,5)+' Ω · Xₜ = '+fmt(s.xt,5)+' Ω<br>Icc máxima calculada = <strong>'+fmt(m.maxOrigin,2)+' kA</strong>'+warning;}
  $("selectedSection").innerHTML=available.map(r=>'<option value="'+r.section+'">'+fmt(r.section,1)+' mm²</option>').join("");$("selectedSection").value=String(chosenSection);
@@ -312,7 +334,7 @@ function renderSteps(m,s,inom,ev){
   :'Iᵦ ≤ Iₙ ≤ I𝓏: '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(s.iz,2)+' A<br>I<sub>f</sub> = '+fmt(ev.i2/inom,1)+' · Iₙ = '+fmt(ev.i2,2)+' A ≤ 1,45 · I𝓏 = '+fmt(1.45*s.iz,2)+' A';
  html+='<h3>3. Coordinación con la protección</h3><div class="eq">'+stepProtectionFormula+'</div>';
  const sourceExplanation=m.sourceCalc?'<div class="eq">Zₜ = (uₖ/100) · Uₙ²/Sₙ = '+fmt(m.sourceCalc.zt,5)+' Ω<br>Icc máxima calculada en la protección = '+fmt(m.maxOrigin,2)+' kA</div>':m.abbreviatedCalc?'<div class="eq">R₂₀ = Σ ρ · 2L/S = '+fmt(m.abbreviatedCalc.resistance,5)+' Ω<br>Icc máxima = 0,8 · U₀/R₂₀ = '+fmt(m.maxOrigin,2)+' kA</div>':'<p>Icc máxima introducida directamente en el punto de la protección.</p>';
- html+='<h3>4. Cortocircuitos</h3>'+sourceExplanation+'<p>La Icc mínima en el origen se introduce de forma independiente. En el extremo se añade el bucle completo del circuito, ida y vuelta, con el conductor a su temperatura máxima.</p><div class="eq">ρ<sub>'+fmt(s.sc.tmax,0)+'</sub> = '+fmt(s.sc.rho20,5)+' · [1 + 0,00393 · ('+fmt(s.sc.tmax,0)+' − 20)] = '+fmt(s.sc.rhoHot,5)+' Ω·mm²/m</div><div class="eq">R bucle caliente = 2 · ρ · L / S = 2 · '+fmt(s.sc.rhoHot,5)+' · '+fmt(m.length,2)+' / '+fmt(s.section,1)+' = '+fmt(s.sc.rHot,5)+' Ω</div><div class="eq">Z origen mín. = 0,8 · U₀ / Icc mín. origen = 0,8 · '+fmt(s.sc.u0,2)+' / ('+fmt(m.minOrigin,2)+' · 1000) = '+fmt(s.sc.zSourceMin,5)+' Ω</div><div class="eq">Icc mín. final = 0,8 · U₀ / (Z origen mín. + R bucle) = 0,8 · '+fmt(s.sc.u0,2)+' / ('+fmt(s.sc.zSourceMin,5)+' + '+fmt(s.sc.rHot,5)+') = <strong>'+fmt(s.sc.minEnd,0)+' A</strong></div>';
+ html+='<h3>4. Cortocircuitos</h3>'+sourceExplanation+'<p>La Icc mínima en el origen se introduce de forma independiente. En el extremo se añade el bucle completo del circuito, ida y vuelta, con el conductor a su temperatura máxima.</p><div class="eq">ρ<sub>'+fmt(s.sc.tmax,0)+'</sub> = '+fmt(s.sc.rho20,5)+' · [1 + '+fmt(s.sc.alpha,5)+' · ('+fmt(s.sc.tmax,0)+' − 20)] = '+fmt(s.sc.rhoHot,5)+' Ω·mm²/m</div><div class="eq">R bucle caliente = 2 · ρ · L / S = 2 · '+fmt(s.sc.rhoHot,5)+' · '+fmt(m.length,2)+' / '+fmt(s.section,1)+' = '+fmt(s.sc.rHot,5)+' Ω</div><div class="eq">Z origen mín. = 0,8 · U₀ / Icc mín. origen = 0,8 · '+fmt(s.sc.u0,2)+' / ('+fmt(m.minOrigin,2)+' · 1000) = '+fmt(s.sc.zSourceMin,5)+' Ω</div><div class="eq">Icc mín. final = 0,8 · U₀ / (Z origen mín. + R bucle) = 0,8 · '+fmt(s.sc.u0,2)+' / ('+fmt(s.sc.zSourceMin,5)+' + '+fmt(s.sc.rHot,5)+') = <strong>'+fmt(s.sc.minEnd,0)+' A</strong></div>';
  if(m.ptype==="breaker")html+='<p>Comprobación conservadora de disparo instantáneo: '+fmt(s.sc.minEnd,0)+' A ≥ '+fmt(ev.magFactor,0)+' · '+fmt(inom,0)+' A = '+fmt(ev.magFactor*inom,0)+' A.</p>';
  else html+='<p>Con fusible gG, la verificación del tiempo de desconexión requiere la curva tiempo-corriente del modelo elegido.</p>';
  $("steps").innerHTML=html;
@@ -320,7 +342,7 @@ function renderSteps(m,s,inom,ev){
 
 function resetChoice(){manualSection=null;manualIn=null}
 ids.forEach(id=>$(id).addEventListener("input",()=>{resetChoice();render()}));
-$("cableDesignation").addEventListener("change",()=>{const selected=designationOptions.find(item=>item.value===$("cableDesignation").value);if(selected)$("insulation").value=selected.insulation;resetChoice();render()});
+$("cableDesignation").addEventListener("change",()=>{const selected=[...designationOptions,...alDesignationOptions].find(item=>item.value===$("cableDesignation").value);if(selected)$("insulation").value=selected.insulation;resetChoice();render()});
 $("dropMode").addEventListener("change",()=>{const u=$("system").value==="mono"?230:400,current=val("dropLimit"),next=$("dropMode").value;if(lastDropMode!==next){$("dropLimit").value=next==="volts"?(current*u/100).toFixed(2):(current/u*100).toFixed(2);lastDropMode=next;}resetChoice();render()});
 $("selectedSection").addEventListener("change",()=>{manualSection=Number($("selectedSection").value);render()});
 $("selectedIn").addEventListener("change",()=>{manualIn=Number($("selectedIn").value);render()});
