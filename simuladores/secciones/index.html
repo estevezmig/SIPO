@@ -168,6 +168,7 @@ const buriedColumns={
 const designationOptions=[
  {value:"H07V-K",label:"H07V-K · PVC · 450/750 V",insulation:"PVC",buried:false},
  {value:"H07Z1-K (AS)",label:"H07Z1-K (AS) · Z1 · 450/750 V",insulation:"PVC",buried:false},
+ {value:"ES07Z1-K (AS)",label:"ES07Z1-K (AS) · Z1 · 450/750 V",insulation:"PVC",buried:false},
  {value:"VV-K",label:"VV-K · PVC/PVC · 0,6/1 kV",insulation:"PVC",buried:true},
  {value:"RV-K",label:"RV-K · XLPE/PVC · 0,6/1 kV",insulation:"XLPE",buried:true},
  {value:"RZ1-K (AS)",label:"RZ1-K (AS) · XLPE/Z1 · 0,6/1 kV",insulation:"XLPE",buried:true}
@@ -203,7 +204,7 @@ function shortCircuit(section,system,u,length,insulation,iccMaxOrigin,iccMinOrig
  const zSourceMax=u0/(iccMaxOrigin*1000),zSourceMin=.8*u0/(iccMinOrigin*1000);
  const maxEnd=u0/(zSourceMax+rCold),minEnd=.8*u0/(zSourceMin+rHot);
  const k=insulation==="PVC"?115:143,thermalLimit=k*section/Math.sqrt(clearingTime);
- return{u0,rCold,rHot,maxEnd,minEnd,thermalLimit,thermalOk:iccMaxOrigin*1000<=thermalLimit};
+ return{u0,rho20,rhoHot,tmax,zSourceMax,zSourceMin,rCold,rHot,maxEnd,minEnd,thermalLimit,thermalOk:iccMaxOrigin*1000<=thermalLimit};
 }
 function transformerOriginIcc(system){
  const sn=val("transformerPower")*1000,un=val("transformerVoltage"),uk=val("transformerUk")/100,pk=val("transformerPk"),length=val("supplyLength"),section=val("supplySection"),parallels=Math.max(1,val("supplyParallels")),xKm=val("supplyReactance"),material=conductorMaterials[$("supplyMaterial").value];
@@ -261,9 +262,13 @@ function renderCriteria(m,row,inom,ev){
  const powerRelation=m.system==="mono"?'P = U · Iᵦ · cos φ ⇔ Iᵦ = P / (U · cos φ)':'P = √3 · U · Iᵦ · cos φ ⇔ Iᵦ = P / (√3 · U · cos φ)';
  const ibValues=m.mode==="power"?'Iᵦ = '+fmt(m.power*1000,0)+' W / '+(m.system==="mono"?'('+fmt(m.u,0)+' V · '+fmt(m.cosPhi,2)+')':'(√3 · '+fmt(m.u,0)+' V · '+fmt(m.cosPhi,2)+')')+' = '+fmt(m.ib,2)+' A':'P calculada = '+fmt(m.power,2)+' kW · Iᵦ introducida = '+fmt(m.ib,2)+' A';
  const izLink=isBuried(m.method)?'<a href="https://www.miguelez.com/descargas/categoria14/intensidades-maximas-admisibles-es.pdf" target="_blank" rel="noopener">Consultar tabla I𝓏 D1/D2 (UNE-HD 60364-5-52) ↗</a>':'<a href="https://industria.gob.es/Calidad-Industrial/seguridadindustrial/instalacionesindustriales/baja-tension/Documents/bt/guia_bt_19_feb09R2.pdf#page=9" target="_blank" rel="noopener">Consultar tabla I𝓏 A1–F (Guía-BT-19) ↗</a>';
- html+=criterionRow(2,"Intensidad máxima admisible",ev.ampOk?"ok":"bad",ev.ampOk?"Cumple":"No cumple",powerRelation+'<br>'+ibValues+'<br>Iᵦ = '+fmt(m.ib,2)+' A ≤ I𝓏 = '+fmt(row.iz,2)+' A<br>'+izLink,minText(mins.amp),row.section);
+ const minAmpText=mins.amp?'Sección mínima requerida: <strong>'+fmt(mins.amp.section,1)+' mm²</strong> (I𝓏 = <strong>'+fmt(mins.amp.iz,2)+' A</strong>)':'No existe una sección válida en la tabla.';
+ html+=criterionRow(2,"Intensidad máxima admisible",ev.ampOk?"ok":"bad",ev.ampOk?"Cumple":"No cumple",powerRelation+'<br>'+ibValues+'<br>Iᵦ = '+fmt(m.ib,2)+' A ≤ I𝓏 = '+fmt(row.iz,2)+' A<br>'+izLink,minAmpText,row.section);
  const pMin=m.ib>inom+1e-9?'No es posible: el calibre elegido Iₙ es menor que Iᵦ.':minText(mins.protection);
- html+=criterionRow(3,"Coordinación con la protección",ev.protectionOk?"ok":"bad",ev.protectionOk?"Cumple":"No cumple",'Iᵦ ≤ Iₙ ≤ I𝓏 &nbsp;·&nbsp; '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(row.iz,2)+' A<br>I₂/If = '+fmt(ev.i2,2)+' A ≤ 1,45 I𝓏 = '+fmt(1.45*row.iz,2)+' A',pMin,row.section);
+ const protectionFormula=m.ptype==="breaker"
+  ?'Iᵦ ≤ Iₙ ≤ I𝓏 &nbsp;·&nbsp; '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(row.iz,2)+' A<br>I₂ = 1,45 · Iₙ = 1,45 · '+fmt(inom,0)+' = '+fmt(ev.i2,2)+' A ≤ 1,45 · I𝓏 = '+fmt(1.45*row.iz,2)+' A'
+  :'Iᵦ ≤ Iₙ ≤ I𝓏 &nbsp;·&nbsp; '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(row.iz,2)+' A<br>I<sub>f</sub> = '+fmt(ev.i2/inom,1)+' · Iₙ = '+fmt(ev.i2/inom,1)+' · '+fmt(inom,0)+' = '+fmt(ev.i2,2)+' A ≤ 1,45 · I𝓏 = '+fmt(1.45*row.iz,2)+' A';
+ html+=criterionRow(3,"Coordinación con la protección",ev.protectionOk?"ok":"bad",ev.protectionOk?"Cumple":"No cumple",protectionFormula,pMin,row.section);
  const fusePending=m.ptype==="fuse"&&ev.shortOk,shortCls=fusePending?"info":ev.shortOk?"ok":"bad",shortStatus=fusePending?"Verificar curva":ev.shortOk?"Cumple":"No cumple";
  const k=m.insulation==="PVC"?115:143,thermalSection=m.maxOrigin*1000*Math.sqrt(m.time)/k;
  const originKind=m.iccMode==="transformer"?"calculada con transformador":m.iccMode==="abbreviated"?"calculada por método abreviado":"introducida";
@@ -302,9 +307,12 @@ function renderSteps(m,s,inom,ev){
  const gamma=s.drop.gamma,simpleS=(m.system==="mono"?2:1)*m.power*1000*m.length/(gamma*m.u*m.limitV),simpleFormula=m.system==="mono"?'S = 2 · P · L / (γ · U · ΔUₘₐₓ)':'S = P · L / (γ · U · ΔUₘₐₓ)';
  html+='<h3>1. Caída de tensión</h3><p>Se adopta el valor más desfavorable: γ = '+fmt(gamma,0)+' m/(Ω·mm²) a '+fmt(s.drop.temp,0)+' °C.</p><div class="eq">'+simpleFormula+' = <strong>'+fmt(simpleS,2)+' mm²</strong></div>'+(m.x>0?'<p>Como x = '+fmt(m.x,3)+' Ω/km, el cálculo final incorpora también la componente reactiva.</p>':'')+'<div class="eq">ΔU calculada = <strong>'+fmt(s.drop.drop,3)+' V</strong> = '+fmt(s.drop.pct,3)+' %</div><p>Límite introducido: <strong>'+fmt(m.limitV,2)+' V ('+fmt(m.limitPct,2)+' %)</strong>.</p>';
  html+='<h3>2. Intensidad máxima admisible</h3><p>Para '+esc(m.method)+', '+esc(m.insulation)+', cable '+esc(m.designation)+', '+(m.system==="mono"?'2':'3')+' conductores cargados y '+fmt(s.section,1)+' mm², la tabla corregida da I𝓏 = <strong>'+fmt(s.iz,2)+' A</strong>.</p><div class="eq">T estimada ≈ '+fmt(s.drop.t0,0)+' + (Tmax − '+fmt(s.drop.t0,0)+') · (Iᵦ/I𝓏)² = '+fmt(s.drop.estimatedTemp,1)+' °C</div>';
- html+='<h3>3. Coordinación con la protección</h3><div class="eq">'+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(s.iz,2)+' A &nbsp;·&nbsp; '+fmt(ev.i2,2)+' ≤ '+fmt(1.45*s.iz,2)+' A</div>';
+ const stepProtectionFormula=m.ptype==="breaker"
+  ?'Iᵦ ≤ Iₙ ≤ I𝓏: '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(s.iz,2)+' A<br>I₂ = 1,45 · Iₙ = '+fmt(ev.i2,2)+' A ≤ 1,45 · I𝓏 = '+fmt(1.45*s.iz,2)+' A'
+  :'Iᵦ ≤ Iₙ ≤ I𝓏: '+fmt(m.ib,2)+' ≤ '+fmt(inom,0)+' ≤ '+fmt(s.iz,2)+' A<br>I<sub>f</sub> = '+fmt(ev.i2/inom,1)+' · Iₙ = '+fmt(ev.i2,2)+' A ≤ 1,45 · I𝓏 = '+fmt(1.45*s.iz,2)+' A';
+ html+='<h3>3. Coordinación con la protección</h3><div class="eq">'+stepProtectionFormula+'</div>';
  const sourceExplanation=m.sourceCalc?'<div class="eq">Zₜ = (uₖ/100) · Uₙ²/Sₙ = '+fmt(m.sourceCalc.zt,5)+' Ω<br>Icc máxima calculada en la protección = '+fmt(m.maxOrigin,2)+' kA</div>':m.abbreviatedCalc?'<div class="eq">R₂₀ = Σ ρ · 2L/S = '+fmt(m.abbreviatedCalc.resistance,5)+' Ω<br>Icc máxima = 0,8 · U₀/R₂₀ = '+fmt(m.maxOrigin,2)+' kA</div>':'<p>Icc máxima introducida directamente en el punto de la protección.</p>';
- html+='<h3>4. Cortocircuitos</h3>'+sourceExplanation+'<p>La Icc mínima en el origen se introduce de forma independiente. En el extremo se añade el bucle completo del circuito, ida y vuelta, con el conductor a su temperatura máxima.</p><div class="eq">R bucle caliente = 2 · ρ · L / S = '+fmt(s.sc.rHot,5)+' Ω</div><div class="eq">Icc mín. final = 0,8 · U₀ / (Z origen + R bucle) = <strong>'+fmt(s.sc.minEnd,0)+' A</strong></div>';
+ html+='<h3>4. Cortocircuitos</h3>'+sourceExplanation+'<p>La Icc mínima en el origen se introduce de forma independiente. En el extremo se añade el bucle completo del circuito, ida y vuelta, con el conductor a su temperatura máxima.</p><div class="eq">ρ<sub>'+fmt(s.sc.tmax,0)+'</sub> = '+fmt(s.sc.rho20,5)+' · [1 + 0,00393 · ('+fmt(s.sc.tmax,0)+' − 20)] = '+fmt(s.sc.rhoHot,5)+' Ω·mm²/m</div><div class="eq">R bucle caliente = 2 · ρ · L / S = 2 · '+fmt(s.sc.rhoHot,5)+' · '+fmt(m.length,2)+' / '+fmt(s.section,1)+' = '+fmt(s.sc.rHot,5)+' Ω</div><div class="eq">Z origen mín. = 0,8 · U₀ / Icc mín. origen = 0,8 · '+fmt(s.sc.u0,2)+' / ('+fmt(m.minOrigin,2)+' · 1000) = '+fmt(s.sc.zSourceMin,5)+' Ω</div><div class="eq">Icc mín. final = 0,8 · U₀ / (Z origen mín. + R bucle) = 0,8 · '+fmt(s.sc.u0,2)+' / ('+fmt(s.sc.zSourceMin,5)+' + '+fmt(s.sc.rHot,5)+') = <strong>'+fmt(s.sc.minEnd,0)+' A</strong></div>';
  if(m.ptype==="breaker")html+='<p>Comprobación conservadora de disparo instantáneo: '+fmt(s.sc.minEnd,0)+' A ≥ '+fmt(ev.magFactor,0)+' · '+fmt(inom,0)+' A = '+fmt(ev.magFactor*inom,0)+' A.</p>';
  else html+='<p>Con fusible gG, la verificación del tiempo de desconexión requiere la curva tiempo-corriente del modelo elegido.</p>';
  $("steps").innerHTML=html;
