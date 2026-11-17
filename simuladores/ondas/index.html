@@ -368,7 +368,7 @@ select{padding:7px 10px}
 </head>
 <body>
 <header>
-  <a class="back-link" href="../../">← Volver a SIPO</a>
+  <a id="volver-origen" class="back-link" hidden>← Volver</a><script>(()=>{const destinos={sipo:"https://estevezmig.github.io/SIPO/",inel:"https://estevezmig.github.io/INEL/",elap:"https://estevezmig.github.io/ELAP/",portal:"https://estevezmig.github.io/portal-fp/"};const origen=new URLSearchParams(location.search).get("origen");const enlace=document.getElementById("volver-origen");if(Object.hasOwn(destinos,origen)){enlace.href=destinos[origen];enlace.hidden=false;}})();</script>
   <h1>Simulador interactivo de ondas senoidales</h1>
   <p>Sistemas de Potencia · amplitud, frecuencia, desfase y superposición de hasta 3 funciones</p>
 </header>
