@@ -24,10 +24,12 @@ details{border-top:1px solid var(--line);padding:11px 0 0;margin-top:11px}detail
 .access-gate{max-width:440px;margin:40px auto;padding:24px}.access-gate button{margin-top:12px;width:100%}.access-error{color:#a52323;min-height:1.4em;font-size:.9rem}[hidden]{display:none!important}
 @media(max-width:950px){main{grid-template-columns:1fr}.controls{position:static;max-height:none;overflow:visible}.summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:720px){main{padding:12px}.card{padding:14px}.flow{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.metric strong{font-size:1rem}.criterion{grid-template-columns:1fr}.criterion>div{border-right:0;border-bottom:1px solid var(--line)}.criterion>div:last-child{border-bottom:0}.criterion-selected{text-align:left}.choice-panel{grid-template-columns:1fr 1fr}.choice-panel button{grid-column:1/-1}}
+
+.header-export{position:absolute;top:18px;right:max(20px,calc((100vw - 1320px)/2));display:flex;gap:8px;flex-wrap:wrap}.header-export button{background:white;color:#173b64}.header-wrap{padding-right:290px}#informeImpresion{display:none}@media(max-width:720px){.header-export{position:static;margin-top:14px}.header-wrap{padding-right:0}}@media print{@page{size:A4;margin:15mm}body>*:not(#informeImpresion){display:none!important}#informeImpresion{display:block!important;color:#111;font:10pt/1.35 Arial,sans-serif}#informeImpresion h1{font-size:17pt;margin:0 0 8pt}#informeImpresion h2{font-size:12pt;margin:14pt 0 5pt;border-bottom:1px solid #777}#informeImpresion p{white-space:pre-wrap;overflow-wrap:anywhere;margin:4pt 0}#informeImpresion section{break-inside:auto}#informeImpresion h2{break-after:avoid}}
 </style>
 </head>
 <body>
-<header><a id="volver-origen" hidden>← Volver</a><script>(()=>{const destinos={sipo:"https://estevezmig.github.io/SIPO/",inel:"https://estevezmig.github.io/INEL/",elap:"https://estevezmig.github.io/ELAP/",portal:"https://estevezmig.github.io/portal-fp/"};const origen=new URLSearchParams(location.search).get("origen");const enlace=document.getElementById("volver-origen");if(Object.hasOwn(destinos,origen)){enlace.href=destinos[origen];enlace.hidden=false;}})();</script><h1>Simulador de cálculo de secciones</h1><p>Dimensiona una línea y justifica cada comprobación según el REBT.</p></header>
+<header><a id="volver-origen" hidden>← Volver</a><script>(()=>{const destinos={sipo:"https://estevezmig.github.io/SIPO/",inel:"https://estevezmig.github.io/INEL/",elap:"https://estevezmig.github.io/ELAP/",portal:"https://estevezmig.github.io/portal-fp/"};const origen=new URLSearchParams(location.search).get("origen");const enlace=document.getElementById("volver-origen");if(Object.hasOwn(destinos,origen)){enlace.href=destinos[origen];enlace.hidden=false;}})();</script><div class="header-wrap"><h1>Simulador de cálculo de secciones</h1><p>Dimensiona una línea y justifica cada comprobación según el REBT.</p></div><div id="accionesInforme" class="header-export" hidden><button id="exportarPDF" type="button">Imprimir / PDF</button><button id="exportarWord" type="button">Descargar Word</button></div></header>
 
 <section id="accessGate" class="card access-gate" aria-labelledby="accessTitle">
   <h2 id="accessTitle">Acceso al simulador</h2>
@@ -158,7 +160,7 @@ $("accessForm").addEventListener("submit",async event=>{
  try{digest=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(candidate))),byte=>byte.toString(16).padStart(2,"0")).join("");}
  catch{$("accessError").textContent="No se pudo verificar el acceso. Abra el simulador desde su dirección HTTPS.";return;}
  if(digest!=="8638ecde8f905bf36eb0263ec54fa38c8aba8332f62e314c69f3a213139ae5ab"){$("accessError").textContent="Contraseña incorrecta. Inténtalo de nuevo.";$("accessPassword").focus();return;}
- $("accessError").textContent="";$("accessGate").hidden=true;$("simulatorMain").hidden=false;$("system").focus();render();
+ $("accessError").textContent="";$("accessGate").hidden=true;$("simulatorMain").hidden=false;$("accionesInforme").hidden=false;$("system").focus();render();
 });
 
 const sections=[1.5,2.5,4,6,10,16,25,35,50,70,95,120,150,185,240,300,400,500,630];
@@ -435,6 +437,62 @@ $("selectedIn").addEventListener("change",()=>{manualIn=Number($("selectedIn").v
 $("autoChoice").addEventListener("click",()=>{resetChoice();render()});
 document.querySelectorAll("[data-preset]").forEach(button=>button.addEventListener("click",()=>{const p=button.dataset.preset;$("dropMode").value="percent";$("reactance").value=0;$("iccMode").value="direct";lastDropMode="percent";if(p==="home"){$("system").value="mono";$("loadMode").value="power";$("power").value=5.75;$("cosPhi").value=1;$("length").value=10;$("dropLimit").value=3;$("method").value="B1";$("insulation").value="PVC";$("protection").value="breaker";$("curve").value="C";}if(p==="motor"){$("system").value="tri";$("loadMode").value="power";$("power").value=15;$("cosPhi").value=.82;$("length").value=45;$("dropLimit").value=5;$("method").value="E";$("insulation").value="XLPE";$("protection").value="breaker";$("curve").value="D";}if(p==="long"){$("system").value="mono";$("loadMode").value="current";$("current").value=20;$("cosPhi").value=.9;$("length").value=120;$("dropLimit").value=3;$("method").value="B1";$("insulation").value="PVC";$("protection").value="breaker";$("curve").value="C";}resetChoice();render();}));
 </script>
-</body>
+<article id="informeImpresion" aria-label="Informe de cálculo"></article><script>\n// Informe elaborado con los valores y resultados visibles del caso actual.
+const informeTexto = node => (node.innerText || '').replace(/\u00a0/g,' ').trim();
+function crearInforme(){
+  if ($('simulatorMain').hidden || !$('criteria').textContent.trim() || !$('selectedSection').value) {
+    alert('Introduce datos válidos y espera a que se calculen los resultados antes de generar el informe.'); return null;
+  }
+  const datos=[];
+  document.querySelectorAll('.controls input, .controls select').forEach(el=>{
+    if(el.closest('[hidden]') || el.disabled || !el.getClientRects().length) return;
+    const label=el.id && document.querySelector('label[for="'+el.id+'"]');
+    const field=el.closest('.field, .segment-row');
+    let name=(label && informeTexto(label)) || (el.closest('label') && informeTexto(el.closest('label'))) || el.getAttribute('aria-label') || el.id;
+    const segment=el.closest('.segment-row');
+    if(segment){const heading=segment.querySelector(':scope > span');if(heading)name=informeTexto(heading)+' · '+name;}
+    let value=el.tagName==='SELECT' ? el.options[el.selectedIndex]?.text : el.type==='checkbox' ? (el.checked?'Sí':'No') : el.value;
+    if(name && value!==undefined) datos.push([name,String(value)]);
+  });
+  const sections=[];
+  const add=(title,content)=>sections.push({title,content});
+  add('Datos de partida',datos.map(([a,b])=>a+': '+b).join('\n'));
+  add('Selección y resultado',informeTexto($('verdict'))+'\nSección seleccionada: '+$('selectedSection').selectedOptions[0].text+'\nProtección seleccionada: '+$('selectedIn').selectedOptions[0].text+'\n'+informeTexto($('summary')));
+  add('Comprobaciones por criterio',Array.from($('criteria').children).map(informeTexto).join('\n\n'));
+  add('Desarrollo paso a paso',informeTexto($('steps')));
+  const source=document.querySelector('.sources');
+  add('Observaciones y alcance',Array.from(source.querySelectorAll(':scope > p')).map(informeTexto).filter(Boolean).join('\n\n'));
+  return {fecha:new Date().toLocaleString('es-ES'),sections};
+}
+function exportarPDF(){
+  const report=crearInforme();if(!report)return;
+  const box=$('informeImpresion'); box.replaceChildren();
+  const heading=document.createElement('h1');heading.textContent='Informe · Cálculo de secciones';box.append(heading);
+  const meta=document.createElement('p');meta.textContent='Fecha: '+report.fecha+'   ·   Nombre / proyecto: __________________________________';box.append(meta);
+  report.sections.forEach(part=>{const section=document.createElement('section'),h=document.createElement('h2'),p=document.createElement('p');h.textContent=part.title;p.textContent=part.content;section.append(h,p);box.append(section)});
+  window.print();
+}
+const xmlSafe=s=>String(s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function crc32(bytes){let crc=0xffffffff;for(const byte of bytes){crc^=byte;for(let j=0;j<8;j++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}return (crc^0xffffffff)>>>0}
+function zipSimple(files){
+  const enc=new TextEncoder(),chunks=[],central=[];let offset=0;
+  const u16=(d,o,v)=>d.setUint16(o,v,true),u32=(d,o,v)=>d.setUint32(o,v,true);
+  for(const [name,content] of files){const n=enc.encode(name),data=enc.encode(content),crc=crc32(data),local=new Uint8Array(30+n.length),l=new DataView(local.buffer);u32(l,0,0x04034b50);u16(l,4,20);u16(l,6,0x0800);u32(l,14,crc);u32(l,18,data.length);u32(l,22,data.length);u16(l,26,n.length);local.set(n,30);chunks.push(local,data);
+    const entry=new Uint8Array(46+n.length),d=new DataView(entry.buffer);u32(d,0,0x02014b50);u16(d,4,20);u16(d,6,20);u16(d,8,0x0800);u32(d,16,crc);u32(d,20,data.length);u32(d,24,data.length);u16(d,28,n.length);u32(d,42,offset);entry.set(n,46);central.push(entry);offset+=local.length+data.length;}
+  const centralSize=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array(22),e=new DataView(end.buffer);u32(e,0,0x06054b50);u16(e,8,files.length);u16(e,10,files.length);u32(e,12,centralSize);u32(e,16,offset);return new Blob([...chunks,...central,end],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+}
+function exportarWord(){
+  const report=crearInforme();if(!report)return;
+  const para=(txt,style)=>'<w:p><w:pPr>'+(style?'<w:pStyle w:val="'+style+'"/>':'')+'</w:pPr><w:r><w:t xml:space="preserve">'+xmlSafe(txt)+'</w:t></w:r></w:p>';
+  let body=para('Informe · Cálculo de secciones','Title')+para('Fecha: '+report.fecha)+para('Nombre / proyecto: __________________________________');
+  report.sections.forEach(p=>{body+=para(p.title,'Heading1');p.content.split('\n').forEach(line=>{body+=para(line)});});
+  const documentXml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>'+body+'<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="850" w:right="900" w:bottom="850" w:left="900" w:header="400" w:footer="400" w:gutter="0"/></w:sectPr></w:body></w:document>';
+  const styles='<?xml version="1.0" encoding="UTF-8"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:rPr><w:sz w:val="20"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:rPr><w:b/><w:sz w:val="32"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="200" w:after="80"/></w:pPr><w:rPr><w:b/><w:color w:val="174F8D"/><w:sz w:val="24"/></w:rPr></w:style></w:styles>';
+  const files=[['[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>'],['_rels/.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],['word/_rels/document.xml.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],['word/document.xml',documentXml],['word/styles.xml',styles]];
+  const url=URL.createObjectURL(zipSimple(files)),a=document.createElement('a');a.href=url;a.download='informe_calculo_secciones.docx';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+$('exportarPDF').addEventListener('click',exportarPDF);
+$('exportarWord').addEventListener('click',exportarWord);
+\n</script>\n</body>
 </html>
 
