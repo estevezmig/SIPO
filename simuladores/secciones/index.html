@@ -437,7 +437,8 @@ $("selectedIn").addEventListener("change",()=>{manualIn=Number($("selectedIn").v
 $("autoChoice").addEventListener("click",()=>{resetChoice();render()});
 document.querySelectorAll("[data-preset]").forEach(button=>button.addEventListener("click",()=>{const p=button.dataset.preset;$("dropMode").value="percent";$("reactance").value=0;$("iccMode").value="direct";lastDropMode="percent";if(p==="home"){$("system").value="mono";$("loadMode").value="power";$("power").value=5.75;$("cosPhi").value=1;$("length").value=10;$("dropLimit").value=3;$("method").value="B1";$("insulation").value="PVC";$("protection").value="breaker";$("curve").value="C";}if(p==="motor"){$("system").value="tri";$("loadMode").value="power";$("power").value=15;$("cosPhi").value=.82;$("length").value=45;$("dropLimit").value=5;$("method").value="E";$("insulation").value="XLPE";$("protection").value="breaker";$("curve").value="D";}if(p==="long"){$("system").value="mono";$("loadMode").value="current";$("current").value=20;$("cosPhi").value=.9;$("length").value=120;$("dropLimit").value=3;$("method").value="B1";$("insulation").value="PVC";$("protection").value="breaker";$("curve").value="C";}resetChoice();render();}));
 </script>
-<article id="informeImpresion" aria-label="Informe de cálculo"></article><script>\n// Informe elaborado con los valores y resultados visibles del caso actual.
+<article id="informeImpresion" aria-label="Informe de cálculo"></article><script>
+// Informe elaborado con los valores y resultados visibles del caso actual.
 const informeTexto = node => (node.innerText || '').replace(/\u00a0/g,' ').trim();
 function crearInforme(){
   if ($('simulatorMain').hidden || !$('criteria').textContent.trim() || !$('selectedSection').value) {
@@ -493,6 +494,8 @@ function exportarWord(){
 }
 $('exportarPDF').addEventListener('click',exportarPDF);
 $('exportarWord').addEventListener('click',exportarWord);
-\n</script>\n</body>
+
+</script>
+</body>
 </html>
 
