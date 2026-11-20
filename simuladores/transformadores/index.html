@@ -1,0 +1,284 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIPO · Simulador de transformadores monofásicos</title><style>
+:root{font-family:system-ui,Segoe UI,Arial,sans-serif;color:#172638;background:#f4f7fa}*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #dce4eb;padding:15px max(20px,calc((100vw - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px}h1{font-size:1.35rem;margin:0}small{color:#64748b}main{max-width:1200px;margin:22px auto;padding:0 18px}nav{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 18px}.tab{border:1px solid #d5dfeb;background:white;border-radius:8px;padding:10px 13px;cursor:pointer;color:#334155}.tab.active{background:#1e4766;color:white;border-color:#1e4766}.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px}.panel{background:#fff;border:1px solid #dce4eb;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 2px 7px #1232 04}h2{margin:0 0 12px;font-size:1.12rem}h3{font-size:.98rem;margin:0 0 12px}label{display:block;font-size:.88rem;font-weight:600;margin:12px 0 4px}input,select{width:100%;border:1px solid #cbd5e1;border-radius:7px;padding:9px;font:inherit;background:white}input:focus,select:focus{outline:2px solid #7fb7dc}.fieldnote{font-size:.75rem;color:#64748b;margin-top:4px}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:15px 0}.metric{border:1px solid #dce4eb;background:#f8fafc;border-radius:9px;padding:10px;min-width:0}.metric .key{font-size:.77rem;color:#526276}.metric .val{font-size:1.23rem;font-weight:700;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.note{background:#f2f7fb;border-left:3px solid #4780a6;padding:11px 13px;font-size:.89rem;line-height:1.5;margin-top:12px}.warning{background:#fff7e9;border-left-color:#bb7d22}.formula{background:#f8fafc;border-radius:8px;padding:10px 14px;font-family:Cambria,Georgia,serif;font-size:1.02rem;line-height:1.7;overflow-wrap:anywhere}svg{width:100%;height:auto}.visual{border:1px solid #e2e8f0;border-radius:10px;padding:12px}.hidden{display:none!important}.actions{display:flex;gap:8px;margin:10px 0}.action{background:#215675;color:white;border:none;padding:9px 13px;border-radius:8px;cursor:pointer}.action.secondary{background:#e5edf4;color:#1d3b55}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.status{font-size:.84rem;color:#526276}.footer{text-align:center;margin:30px 0;color:#66778a;font-size:.77rem}.fasor{max-width:440px;margin:10px auto 0;padding:10px;border:1px solid #e2e8f0;border-radius:8px}.fasor h3{text-align:center;margin:0;font-size:.87rem;color:#526276}canvas{width:100%;height:225px;border:1px solid #e2e8f0;border-radius:8px}.detail{font-size:.88rem;line-height:1.65}.detail strong{color:#163e59}.stack{display:flex;flex-wrap:wrap;gap:12px}.pill{padding:4px 8px;background:#e8f0f8;border-radius:5px;font-size:.78rem}@media(max-width:790px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}header{padding:13px 17px}}
+
+/* Ampliaciones didácticas: animación del flujo, equivalentes y ejercicios por categorías */
+.visual h3{font-size:.9rem;color:#324a61;margin:14px 0 8px}.subfigure{border-top:1px solid #dce4eb;margin-top:18px;padding-top:12px}.subfigure:first-child{border-top:0;margin-top:0;padding-top:0}.subfigure svg{display:block;max-height:315px}.mag-hint{font-size:.83rem;color:#526276;margin:6px 0 0;line-height:1.5}.mag-live{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}.mag-live .metric{flex:1;min-width:125px}.mag-live strong{font-variant-numeric:tabular-nums}.quiz-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}.quiz-grid label{margin:3px 0 5px}.quiz-grid input{max-width:250px}.quiz-question{font-size:.91rem;line-height:1.6}.quiz-feedback{margin-top:9px;font-weight:600;font-size:.9rem}.quiz-feedback.correct{color:#276046}.quiz-feedback.incorrect{color:#8d392e}.quiz-formula{line-height:1.85}.quiz-answer{display:inline-block;padding:5px 0}.minor-head{font-size:.9rem;margin:13px 0 6px;color:#243b53}@media(max-width:570px){.quiz-grid{grid-template-columns:1fr}.mag-live .metric{min-width:110px}}
+
+/* Navegación y pantalla de acceso para la publicación en Portal-FP */
+header{flex-wrap:wrap}
+.sipo-return{display:inline-flex;align-items:center;align-self:center;padding:9px 12px;color:#164a70;background:#e9f2f8;border:1px solid #bfd5e5;border-radius:8px;text-decoration:none;font-size:.88rem;font-weight:700;white-space:nowrap}
+.sipo-return:hover,.sipo-return:focus-visible{background:#d6eafb}
+#sipoAccessLayer{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:#eef3f8;padding:22px}
+#sipoAccessLayer[hidden]{display:none!important}
+#sipoAccessLayer form{max-width:420px;width:100%;background:#fff;border:1px solid #cfdae5;border-radius:15px;box-shadow:0 15px 45px #163b5f20;padding:30px}
+#sipoAccessLayer h2{margin:0 0 8px;font-size:1.4rem}
+#sipoAccessLayer p{font-size:.9rem;color:#5b7187;line-height:1.5}
+#sipoAccessLayer label{margin-top:19px}
+#sipoAccessLayer button{width:100%;border:0;border-radius:8px;padding:11px;color:white;background:#1e4766;font-weight:750;margin-top:16px;cursor:pointer}
+#sipoAccessError{min-height:1.4em;color:#9b2929!important;font-weight:600}
+html.sipo-locked{overflow:hidden}
+@media(max-width:700px){header{align-items:start}header>div{order:2;width:100%}header>.sipo-return{order:1}header>small{order:3}}
+</style></head><body><div id="sipoAccessLayer" role="dialog" aria-modal="true" aria-labelledby="sipoAccessTitle"><form id="sipoUnlock" autocomplete="off"><h2 id="sipoAccessTitle">SIPO · Transformadores</h2><p>Introduce la contraseña para acceder al simulador.</p><label for="sipoPassword">Contraseña</label><input id="sipoPassword" name="clave" type="password" autocomplete="off" required><button type="submit">Acceder</button><p id="sipoAccessError" role="alert" aria-live="polite"></p></form></div><script>(function(){document.documentElement.classList.add('sipo-locked');const f=document.getElementById('sipoUnlock'),p=document.getElementById('sipoPassword'),d=document.getElementById('sipoAccessLayer'),err=document.getElementById('sipoAccessError');f.addEventListener('submit',function(e){e.preventDefault();if(p.value==='SIPO_2026'){document.documentElement.classList.remove('sipo-locked');d.hidden=true;p.value='';window.dispatchEvent(new Event('resize'));}else{err.textContent='Contraseña incorrecta.';p.value='';p.focus();}});p.focus();})();</script><header><a class="sipo-return" href="https://estevezmig.github.io/SIPO/">← Volver a SIPO</a><div><h1>SIPO · Transformadores monofásicos</h1><small>Simulador didáctico · Monofásicos · Versión ampliada</small></div><small>Sin conexión a Internet</small></header><main><nav role="tablist" aria-label="Módulos"><button class="tab active" data-tab="ideal">1 · Ideal</button><button class="tab" data-tab="real">2 · Real</button><button class="tab" data-tab="equiv">3 · Circuito equivalente</button><button class="tab" data-tab="vacio">4 · Ensayo en vacío</button><button class="tab" data-tab="corto">5 · Ensayo de cortocircuito</button><button class="tab" data-tab="flujo">6 · Flujo magnético</button><button class="tab" data-tab="ejercicio">7 · Ejercicios</button></nav><div class="layout"><section class="panel"><h2>Parámetros</h2><div id="fields"></div><p class="status" id="fieldstatus"></p><div class="actions"><button class="action secondary" id="reset">Restablecer ejemplo</button></div><div class="note" id="context"></div></section><section><div class="panel"><h2 id="sectionTitle">Transformador ideal</h2><div id="metrics" class="cards"></div><div class="visual" id="diagram"></div><div class="note" id="explanation"></div></div><div class="panel" id="graphPanel"><h3 id="graphTitle">Ondas de tensión</h3><canvas id="chart" width="900" height="300" aria-label="Gráfica de señales"></canvas><div class="stack" id="legend"></div></div><div class="panel"><h3>Relaciones y criterios de cálculo</h3><div id="formulas" class="formula"></div></div></section></div><div class="footer">Miguel Estévez Ferreiro · Material didáctico SIPO · Simulador interactivo · SIPO</div></main><script>
+'use strict';
+const $=id=>document.getElementById(id), tabs=[...document.querySelectorAll('.tab')];
+let tab='ideal';
+const defaults={ideal:{v1:230,n1:500,n2:250,r:50,f:50},real:{v1:230,n1:500,n2:250,r:50,x:20,r1:1.2,x1:1.5,r2:.35,x2:.5,rc:12500,xm:2800,f:50},equiv:{n1:500,n2:250,r2:.35,x2:.5,r1:1.2,x1:1.5,rc:12500,xm:2800},vacio:{v:230,i:0.35,p:25},corto:{v:18,i:5,p:42},flujo:{n1:500,n2:250,f:50,phimax:2},ejercicio:{v1:230,n1:600,n2:300,r:40}};
+const labels={v2:['Tensión secundaria deseada V₂','V'],b:['Densidad máxima de flujo Bₘₐₓ','T'],afe:['Sección eficaz del núcleo AFe','cm²'],snom:['Potencia aparente nominal Sₙ','VA'],j:['Densidad de corriente de cálculo J','A/mm²'],phimax:['Flujo máximo Φₘₐₓ','mWb'],v1:['Tensión primaria V₁','V'],n1:['Espiras N₁',''],n2:['Espiras N₂',''],r:['Resistencia de carga R','Ω'],x:['Reactancia de carga X (inductiva +)','Ω'],r1:['Resistencia primaria R₁','Ω'],x1:['Reactancia dispersión primaria X₁','Ω'],r2:['Resistencia secundaria R₂','Ω'],x2:['Reactancia dispersión secundaria X₂','Ω'],rc:['Resistencia de pérdidas en hierro RFe','Ω'],xm:['Reactancia magnetizante Xm','Ω'],f:['Frecuencia','Hz'],v:['Voltímetro V','V'],i:['Amperímetro I','A'],p:['Vatímetro P','W']};
+const titles={ideal:'Transformador ideal con carga resistiva',real:'Transformador real · Circuito equivalente aproximado',equiv:'Impedancias referidas al primario',vacio:'Ensayo en vacío · pérdidas en el hierro y magnetización',corto:'Ensayo de cortocircuito · parámetros referidos al primario',flujo:'Flujo magnético alterno e inducción electromagnética',ejercicio:'Practica el cálculo antes de mostrar resultados'};
+const contexts={ideal:'Cambia las espiras y la carga. Comprueba cómo se modifican tensión secundaria y corrientes. En el modelo ideal no hay pérdidas.',real:'Circuito equivalente aproximado referido al primario, con rama de magnetización situada en bornes de entrada. La carga es R + jX; se calculan fasores y pérdidas del modelo. No modela saturación.',equiv:'La relación de transformación que usamos es a = N₁/N₂. Para referir impedancias del secundario al primario se multiplica por a².',vacio:'Introduce las lecturas eficaces V₁ e I₀ y la potencia P₀ (vatímetro) de un ensayo en vacío. Se desprecia la caída interna y las pérdidas en cobre de vacío para estimar RFe y Xm. P representa aproximadamente las pérdidas en el hierro.',corto:'Introduce las lecturas eficaces V₁cc e I₁N y la potencia Pcc (vatímetro) en el lado alimentado. Se desprecia la corriente de magnetización. La resistencia equivalente incluye pérdidas en cobre de ambos devanados referidas al lado de medida.',flujo:'Observa cómo el flujo magnético alterno induce tensiones en ambas bobinas. La animación está deliberadamente ralentizada: los valores numéricos corresponden a la frecuencia indicada.',ejercicio:'Calcula a mano V₂, I₂ e I₁ del transformador ideal con carga resistiva. Pulsa «Comprobar resultados» para descubrirlos.'};
+let states=structuredClone(defaults),reveal=false;
+const excDefaults={ideal:{v1:230,n1:600,n2:300,r:40},diseno:{v1:230,v2:24,f:50,b:1.2,afe:15,snom:100,j:2.5},vacio:{v:230,i:0.35,p:25},corto:{v:18,i:5,p:42},equiv:{n1:500,n2:250,r1:1.2,x1:1.5,r2:0.35,x2:0.5}};
+const excNames={ideal:'Transformador ideal y carga',diseno:'Construcción: dimensionado inicial',vacio:'Interpretación del ensayo en vacío',corto:'Interpretación del ensayo de cortocircuito',equiv:'Impedancias referidas al primario'};
+const excContexts={ideal:'Con los datos del enunciado, calcula tensión y corrientes del transformador ideal.',diseno:'Diseño electromagnético preliminar de un transformador monofásico. No sustituye la selección de materiales, seguridad eléctrica, aislamiento ni verificaciones térmicas.',vacio:'Obtén cos φ₀, RFe y Xμ a partir de las lecturas de V₁, I₀ y P₀.',corto:'Obtén cos φcc, Rcc y Xcc a partir de V₁cc, I₁N y Pcc.',equiv:'Refiere R₂ y X₂ al primario y obtiene Rcc y Xcc.'};
+let exStates=structuredClone(excDefaults),excType='ideal';
+const excAnswers={ideal:{},diseno:{},vacio:{},corto:{},equiv:{}};
+const INDUCTION_K=2*Math.PI/Math.SQRT2;
+let fluxActive=false, fluxPaused=false, fluxRaf=0,fluxPhase=0,fluxLastTime=0;
+function activeState(){return tab==='ejercicio'?exStates[excType]:states[tab]}
+
+function num(v){if(!Number.isFinite(v))return '—';const abs=Math.abs(v);return abs>0&&abs<.001?v.toExponential(2):Number(v.toPrecision(5)).toLocaleString('es-ES',{maximumFractionDigits:4})}
+function metric(k,v,unit=''){return `<div class="metric"><div class="key">${k}</div><div class="val">${num(v)} ${unit}</div></div>`}
+const c=(re=0,im=0)=>({re,im}),add=(a,b)=>c(a.re+b.re,a.im+b.im),mul=(a,b)=>c(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re),div=(a,b)=>{let d=b.re*b.re+b.im*b.im;return c((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d)},abs=a=>Math.hypot(a.re,a.im),conj=a=>c(a.re,-a.im),scale=(a,k)=>c(a.re*k,a.im*k),inv=a=>div(c(1),a),ph=a=>`${num(abs(a))} ∠ ${num(Math.atan2(a.im,a.re)*180/Math.PI)}°`;
+function inputs(){
+ const data=activeState();$('fields').innerHTML='';
+ if(tab==='ejercicio'){
+  const selectLabel=document.createElement('label');selectLabel.textContent='Tipo de ejercicio';selectLabel.htmlFor='exerciseType';
+  const select=document.createElement('select');select.id='exerciseType';
+  for(const [code,title] of Object.entries(excNames)){const o=document.createElement('option');o.value=code;o.textContent=title;o.selected=code===excType;select.append(o)}
+  select.onchange=()=>{excType=select.value;reveal=false;inputs();render()};
+  $('fields').append(selectLabel,select);
+ }
+ for(const [k,v] of Object.entries(data)){
+  const wrapper=document.createElement('div'),label=document.createElement('label');
+  const names=(tab==='vacio'||(tab==='ejercicio'&&excType==='vacio'))?{v:'Voltímetro V₁',i:'Amperímetro I₀',p:'Vatímetro P₀'}:(tab==='corto'||(tab==='ejercicio'&&excType==='corto'))?{v:'Voltímetro V₁cc',i:'Amperímetro I₁N',p:'Vatímetro Pcc'}:{};
+  label.textContent=names[k]||labels[k][0];label.htmlFor='f_'+k;
+  const inp=document.createElement('input');inp.type='number';inp.id='f_'+k;inp.step='any';inp.value=v;
+  if(k!=='x')inp.min='0';
+  inp.addEventListener('input',()=>{if(inp.value.trim()==='')return;data[k]=Number(inp.value);reveal=false;render()});
+  wrapper.append(label,inp);
+  if(labels[k][1]){let note=document.createElement('div');note.className='fieldnote';note.textContent=labels[k][1];wrapper.append(note)}
+  $('fields').append(wrapper)
+ }
+ $('context').textContent=tab==='ejercicio'?excContexts[excType]:contexts[tab];
+}
+function valid(s){
+ if(Object.values(s).some(x=>!Number.isFinite(x)))return false;
+ const kind=tab==='ejercicio'?excType:tab;
+ const positive=kind==='ideal'?['v1','n1','n2','r']:
+  kind==='diseno'?['v1','v2','f','b','afe','snom','j']:
+  kind==='real'?['v1','n1','n2','r','rc','xm','f']:
+  kind==='equiv'?['n1','n2']:
+  kind==='flujo'?['n1','n2','f','phimax']:
+  ['v','i','p'];
+ if(!positive.every(k=>s[k]>0))return false;
+ return Object.entries(s).every(([key,v])=>key==='x'&&kind==='real'||v>=0);
+}
+function drawTrafo(){return `<svg viewBox="0 0 750 205" role="img" aria-label="Transformador monofásico con primario, núcleo, secundario y carga"><rect x="264" y="17" width="200" height="166" rx="8" fill="#e8eff5" stroke="#7e8b96" stroke-width="15"/><path d="M58 55H222M58 155H222M506 55H670V155H506" stroke="#334155" stroke-width="3" fill="none"/><rect x="658" y="86" width="24" height="40" fill="#fff" stroke="#334155" stroke-width="3"/><g stroke="#d68b37" fill="none" stroke-width="5">${[0,1,2,3,4,5].map(i=>`<path d="M263 ${44+i*21}C224 ${29+i*21},224 ${58+i*21},263 ${58+i*21}"/>`).join('')}</g><g stroke="#2479ac" fill="none" stroke-width="5">${[0,1,2,3,4,5].map(i=>`<path d="M463 ${44+i*21}C502 ${29+i*21},502 ${58+i*21},463 ${58+i*21}"/>`).join('')}</g><g font-family="Arial" font-size="18" fill="#263b50"><text x="66" y="39">V₁ ~</text><text x="559" y="39">V₂ ~</text><text x="233" y="198">N₁</text><text x="488" y="198">N₂</text><text x="690" y="112">Zc</text></g></svg>`}
+function drawCircuit(mode){
+  // Aproximación referida al primario: rama de vacío a la entrada, impedancias serie independientes.
+  const wire='#334155', resistor=(x,y,w=60,h=28)=>`<rect x="${x}" y="${y-h/2}" width="${w}" height="${h}" fill="white" stroke="${wire}" stroke-width="2.7"/>`;
+  const coil=(x,y,n=4,step=16)=>`<path d="M${x} ${y} ${Array.from({length:n},()=>`q ${step/2} -30 ${step} 0`).join(' ')}" fill="none" stroke="${wire}" stroke-width="2.7" stroke-linecap="round"/>`;
+  const verticalCoil=(x,y,n=3,step=17)=>`<path d="M${x} ${y} ${Array.from({length:n},()=>`q 26 ${step/2} 0 ${step}`).join(' ')}" fill="none" stroke="${wire}" stroke-width="2.7"/>`;
+  return `<svg viewBox="0 0 900 270" role="img" aria-label="Circuito equivalente del transformador referido al primario. Fuente alterna sin cortocircuito, rama de magnetización en paralelo y resistencias e inductancias individuales R1, X1, R2 prima y X2 prima en serie con la carga.">
+  <g fill="none" stroke="${wire}" stroke-width="2.7" stroke-linejoin="round">
+    <!-- Alimentación: los dos terminales se unen únicamente a través de la fuente -->
+    <path d="M78 66 V112 M78 160 V212 H795 M78 66 H320"/>
+    <circle cx="78" cy="136" r="24" fill="white"/>
+    <path d="M64 136 q7 -14 14 0 t14 0" stroke="#bd7934" stroke-width="2.5"/>
+    <!-- Rama de pérdidas en hierro, en paralelo con la alimentación -->
+    <path d="M165 66 V81.5 M165 134.5 V212 M235 66 V108 M235 159 V212"/>
+    ${resistor(153,108,24,53)}
+    ${verticalCoil(235,108,3,17)}
+    <!-- Impedancias serie de primario y secundario referidas al primario -->
+    ${resistor(320,66,61,27)}<path d="M381 66 H406"/>
+    ${coil(406,66,4,16)}<path d="M470 66 H522"/>
+    ${resistor(522,66,61,27)}<path d="M583 66 H619"/>
+    ${coil(619,66,4,16)}<path d="M683 66 H795 V90 M795 142 V212"/>
+    ${resistor(782,116,26,52)}
+  </g>
+  <g fill="#20384d" font-family="Segoe UI,Arial,sans-serif" font-size="18">
+    <text x="26" y="132">V₁</text>
+    <text x="182" y="141">RFe</text><text x="252" y="141">jXm</text>
+    <text x="335" y="39">R₁</text><text x="422" y="39">jX₁</text>
+    <text x="535" y="39">R₂′</text><text x="636" y="39">jX₂′</text>
+    <text x="817" y="148">Z′carga</text>
+    <text x="292" y="250" font-size="15" fill="#64748b">Circuito equivalente aproximado referido al primario</text>
+  </g>
+  <g fill="#334155"><circle cx="165" cy="66" r="3.5"/><circle cx="235" cy="66" r="3.5"/><circle cx="165" cy="212" r="3.5"/><circle cx="235" cy="212" r="3.5"/></g>
+  </svg>`;
+}
+function drawInstruments(kind){
+ const vacio=kind==='vacio', line='#34465c';
+ const winding=(x,y,side)=>`<path d="M ${x} ${y} ${Array.from({length:6},(_,k)=>`C ${x+side*30} ${y+k*19+3}, ${x+side*30} ${y+k*19+16}, ${x} ${y+(k+1)*19}`).join(' ')}" fill="none" stroke="${line}" stroke-width="2.8" stroke-linecap="round"/>`;
+ const meter=(x,y,name,r=23)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="white" stroke="${line}" stroke-width="2.7"/><text x="${x}" y="${y+6}" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" fill="#20384d">${name}</text>`;
+ return `<svg viewBox="0 0 850 285" role="img" aria-label="Esquema de ensayo ${vacio?'en vacío':'de cortocircuito'}: amperímetro y bobina de corriente del vatímetro en serie, bobina de tensión del vatímetro y voltímetro conectados en paralelo, devanados del transformador aislados eléctricamente.">
+  <g stroke="${line}" stroke-width="2.7" fill="none" stroke-linecap="round" stroke-linejoin="round">
+   <!-- Red primaria superior e inferior, sin conductor de puente en paralelo a la fuente -->
+   <path d="M78 62 V106 M78 152 V239 H480 M78 62 H195 M241 62 H277 M323 62 H480 V86 M480 200 V239"/>
+   <!-- Voltímetro V1: derivación conectada a ambos bornes -->
+   <path d="M147 62 V115 M147 163 V239"/>
+   <!-- Vatímetro: bobina de corriente integrada en serie (izquierda-derecha), bobina de tensión entre nodo pre-W y retorno -->
+   <path d="M260 62 V29 H300 V39 M300 85 V239"/>
+   <!-- Transformador, dos devanados aislados y núcleo magnético -->
+   ${winding(480,86,+1)}
+   <path d="M594 62 V86 M594 200 V239"/>
+   ${winding(594,86,-1)}
+   <path d="M535 80 V207 M550 80 V207" stroke="#8593a3" stroke-width="5"/>
+   <!-- Instrumentación del secundario: voltímetro en circuito abierto o amperímetro en el puente de cortocircuito -->
+   <path d="M594 62 H735 V111 M735 161 V239 H594"/>
+  </g>
+  ${meter(78,129,'~',23)}
+  ${meter(147,139,'V₁',24)}
+  ${meter(218,62,'A₁',23)}
+  ${meter(300,62,'W',23)}
+  ${meter(735,136,vacio?'V₂':'A₂',25)}
+  <g fill="#20384d" font-family="Segoe UI,Arial,sans-serif" font-size="16">
+    <text x="22" y="96">${vacio?'V₁':'V₁cc'}</text>
+    <text x="183" y="109">${vacio?'I₀':'I₁N'}</text>
+    <text x="315" y="108">${vacio?'P₀':'Pcc'}</text>
+    <text x="450" y="270">Primario</text><text x="565" y="270">Secundario</text>
+    
+  </g>
+  <g fill="#61758a" font-family="Segoe UI,Arial,sans-serif" font-size="13">
+    <text x="280" y="15">W · conexión de tensión</text>
+    <text x="290" y="258">W · retorno de tensión</text>
+  </g>
+ </svg>
+ <p class="status">${vacio?'Ensayo en vacío: secundario sin carga, con V₂ de alta impedancia. La lectura del vatímetro es P₀.':'Ensayo de cortocircuito: secundario cerrado a través del amperímetro A₂. Se alimenta el primario con tensión reducida hasta I₁ = I₁N. La lectura del vatímetro es Pcc.'} El circuito de corriente del vatímetro está en serie y el de tensión está conectado en paralelo.</p>`;
+}
+function fasorVacio(ife,imu){
+ const sc=Math.min(110/Math.max(ife,1e-9),95/Math.max(imu,1e-9)),x=73+ife*sc,y=37+imu*sc;
+ return `<div class="fasor"><h3>Diagrama vectorial · ensayo en vacío</h3><svg viewBox="0 0 380 170" role="img" aria-label="Ife en el eje real positivo, Imu en el eje reactivo negativo e I0 como suma de ambas"><defs><marker id="arrV0" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="#334155"/></marker></defs>
+ <g fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"><path d="M${x} 37V${y}H73"/></g>
+ <g stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrV0)"><path d="M73 12V157"/><path d="M35 37H318"/></g>
+ <path d="M73 37H${x}" stroke="#277cac" stroke-width="3"/><path d="M73 37V${y}" stroke="#31845a" stroke-width="3"/><path d="M73 37L${x} ${y}" stroke="#b24c44" stroke-width="3"/>
+ <g fill="#243b53" font-size="16" font-family="Arial,sans-serif"><text x="${Math.min(x+9,300)}" y="29">I<tspan baseline-shift="sub" font-size="11">Fe</tspan></text><text x="39" y="${Math.min(y+7,165)}">Iμ</text><text x="${Math.min(x+10,300)}" y="${Math.min(y+4,158)}">I₀</text><text x="321" y="42">V₁</text></g>
+ </svg></div>`;
+}
+function fasorCorto(r,x,i){
+ const vr=r*i,vx=x*i,sc=Math.min(140/Math.max(vr,1e-9),95/Math.max(vx,1e-9)),xx=72+vr*sc,yy=143-vx*sc;
+ return `<div class="fasor"><h3>Diagrama vectorial · ensayo de cortocircuito</h3><svg viewBox="0 0 380 180" role="img" aria-label="V resistencia cortocircuito horizontal, V reactancia cortocircuito vertical positiva y V impedancia cortocircuito resultante diagonal"><defs><marker id="arrCC" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="#334155"/></marker></defs>
+ <g fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"><path d="M${xx} 143V${yy}H72"/></g><g stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#arrCC)"><path d="M72 163V10"/><path d="M27 143H325"/></g>
+ <path d="M72 143H${xx}" stroke="#277cac" stroke-width="3"/><path d="M72 143V${yy}" stroke="#31845a" stroke-width="3"/><path d="M72 143L${xx} ${yy}" stroke="#b24c44" stroke-width="3"/>
+ <g fill="#243b53" font-size="16" font-family="Arial,sans-serif"><text x="${xx+8}" y="156">V<tspan baseline-shift="sub" font-size="11">Rcc</tspan></text><text x="24" y="${Math.max(yy-5,14)}">V<tspan baseline-shift="sub" font-size="11">Xcc</tspan></text><text x="${xx+8}" y="${yy+1}">V<tspan baseline-shift="sub" font-size="11">Zcc</tspan></text></g>
+ </svg></div>`;
+}
+
+function drawTestEquivalent(kind,results){
+ const color='#334155';
+ const source=`<path d="M95 68 V105 M95 155 V213" fill="none" stroke="${color}" stroke-width="3"/><circle cx="95" cy="130" r="25" fill="white" stroke="${color}" stroke-width="3"/><path d="M81 131 q7 -13 14 0 t14 0" fill="none" stroke="#b57a32" stroke-width="2.3"/>`;
+ const resistor=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="white" stroke="${color}" stroke-width="3"/>`;
+ const vcoil=(x,y)=>`<path d="M${x} ${y} q30 9 0 18 q30 9 0 18 q30 9 0 18" stroke="${color}" stroke-width="3" fill="none"/>`;
+ const hcoil=(x,y)=>`<path d="M${x} ${y} q11 -29 22 0 q11 -29 22 0 q11 -29 22 0 q11 -29 22 0" stroke="${color}" stroke-width="3" fill="none"/>`;
+ if(kind==='vacio'){
+  return `<div class="subfigure"><h3>Circuito equivalente aproximado del ensayo en vacío (referido al primario)</h3>
+  <svg viewBox="0 0 850 265" role="img" aria-label="Fuente de corriente alterna y dos ramas en paralelo: resistencia RFe para pérdidas en hierro y bobina de reactancia Xm de magnetización. Circuito sin cortocircuito de alimentación.">
+  <g stroke="${color}" stroke-width="3" fill="none"><path d="M95 68 H565 M95 213 H565 M360 68 V113 M360 153 V213 M565 68 V101 M565 155 V213"/>${source}${resistor(345,113,30,40)}${vcoil(565,101)}</g>
+  <g fill="${color}" font-family="Segoe UI,Arial" font-size="20"><text x="35" y="132">V₁</text><text x="289" y="136">RFe</text><text x="594" y="133">jXμ</text><text x="392" y="97" font-size="16">IFe</text><text x="602" y="97" font-size="16">Iμ</text><text x="205" y="44" font-size="16">I₀ = IFe + Iμ (fasores)</text></g>
+  <g fill="#64748b" font-size="16" font-family="Segoe UI,Arial"><text x="290" y="251">RFe ≈ ${num(results.rc)} Ω</text><text x="515" y="251">Xμ ≈ ${num(results.xm)} Ω</text></g></svg>
+  <p class="mag-hint">La rama RFe representa las pérdidas en el hierro; la rama jXμ, la magnetización. En esta aproximación se omiten las impedancias serie y la corriente de carga.</p></div>`;
+ }
+ return `<div class="subfigure"><h3>Circuito equivalente aproximado del ensayo de cortocircuito (referido al primario)</h3>
+ <svg viewBox="0 0 850 265" role="img" aria-label="Fuente alterna con resistencia equivalente Rcc y reactancia inductiva Xcc conectadas en serie y retorno cerrado.">
+ <g stroke="${color}" stroke-width="3" fill="none"><path d="M95 68 H310 M400 68 H496 M584 68 H700 V213 H95"/>${source}${resistor(310,54,90,28)}${hcoil(496,68)}</g>
+ <g font-family="Segoe UI,Arial" font-size="19" fill="${color}"><text x="29" y="132">V₁cc</text><text x="330" y="43">Rcc</text><text x="513" y="43">jXcc</text><text x="174" y="45" font-size="16">I₁cc = I₁N</text></g>
+ <g fill="#64748b" font-size="16" font-family="Segoe UI,Arial"><text x="290" y="251">Rcc ≈ ${num(results.r)} Ω</text><text x="495" y="251">Xcc ≈ ${num(results.x)} Ω</text></g></svg>
+ <p class="mag-hint">Con tensión reducida se desprecia la rama de magnetización: el modelo serie reúne R₁ + R₂′ y X₁ + X₂′, medidos desde el primario.</p></div>`;
+}
+function drawMagnetic(){
+ const winding=(x,direction)=>Array.from({length:6},(_,i)=>`<path d="M${x} ${98+i*26} q${direction*37} 13 0 26" fill="none" stroke="${direction<0?'#c88638':'#2879a9'}" stroke-width="5" stroke-linecap="round"/>`).join('');
+ return `<svg viewBox="0 0 850 358" role="img" aria-label="Núcleo del transformador con devanado primario alimentado por una fuente alterna y secundario en vacío medido mediante un voltímetro. Flechas alternantes muestran el sentido y la intensidad del flujo magnético.">
+ <defs><marker id="fluxArrowHead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 Z" fill="#2574aa"/></marker></defs>
+ <rect x="315" y="53" width="220" height="248" rx="8" stroke="#909fad" stroke-width="20" fill="none"/>
+ <path id="fluxArrowTop" d="M365 53 H485" stroke="#2574aa" stroke-width="6" fill="none" marker-end="url(#fluxArrowHead)" stroke-linecap="round"/>
+ <path id="fluxArrowBottom" d="M485 301 H365" stroke="#2574aa" stroke-width="6" fill="none" marker-end="url(#fluxArrowHead)" stroke-linecap="round"/>
+ <path d="M86 130 H253 V98 H315 M86 252 H253 V254 H315 M86 130 V162 M86 212 V252" stroke="#34465c" stroke-width="2.8" fill="none"/>
+ <path d="M535 98 H611 V130 H765 V164 M765 218 V252 H611 V254 H535" stroke="#34465c" stroke-width="2.8" fill="none"/>
+ ${winding(315,-1)}${winding(535,1)}
+ <g fill="#293e51" font-family="Segoe UI,Arial" font-size="20"><text x="84" y="111">V₁ ~</text><text x="712" y="113">e₂(t)</text><text x="242" y="333">N₁</text><text x="572" y="333">N₂</text></g>
+ <g fill="#526276" font-family="Segoe UI,Arial" font-size="16"><text x="333" y="29">Φ(t) en el núcleo</text><text x="347" y="347">Visualización esquemática</text></g>
+ <circle cx="86" cy="187" r="25" fill="white" stroke="#34465c" stroke-width="2.8"/><path d="M70 187 q8 -15 16 0 t16 0" fill="none" stroke="#c88638" stroke-width="2.6"/>
+ <circle cx="765" cy="191" r="27" fill="white" stroke="#34465c" stroke-width="2.8"/><text x="765" y="197" text-anchor="middle" font-size="19" font-family="Arial" fill="#34465c">V₂</text>
+ <g fill="#64748b" font-size="15" font-family="Segoe UI,Arial"><text x="630" y="295">Medida en vacío</text></g>
+ </svg>
+ <p class="mag-hint">Las flechas representan el <strong>sentido del flujo magnético</strong>; su grosor e intensidad indican el módulo instantáneo. No representan electrones moviéndose por el núcleo. La orientación de las tensiones depende de la referencia elegida para cada devanado.</p>
+ <div class="mag-live" aria-live="off"><div class="metric"><div class="key">Φ(t)</div><div class="val" id="magPhi">—</div></div><div class="metric"><div class="key">e₁(t)</div><div class="val" id="magE1">—</div></div><div class="metric"><div class="key">e₂(t)</div><div class="val" id="magE2">—</div></div><div class="metric"><div class="key">Instante del ciclo</div><div class="val" id="magTime">—</div></div></div>
+ <div class="actions"><button type="button" class="action secondary" id="fluxPause">Pausar animación</button><button type="button" class="action secondary" id="fluxRestart">Reiniciar ciclo</button></div>`;
+}
+function stopFlux(){fluxActive=false;if(fluxRaf)cancelAnimationFrame(fluxRaf);fluxRaf=0;fluxLastTime=0;}
+function startFlux(){if(tab!=='flujo')return;stopFlux();fluxActive=true;fluxPaused=false;fluxLastTime=0;fluxRaf=requestAnimationFrame(fluxFrame);}
+function fluxFrame(timestamp){
+ if(!fluxActive||tab!=='flujo')return;
+ const dt=fluxLastTime?Math.min((timestamp-fluxLastTime)/1000,.1):0;fluxLastTime=timestamp;
+ if(!fluxPaused)fluxPhase=(fluxPhase+dt*2*Math.PI/4)%(4*Math.PI); // 4 s por ciclo: ralentización visual
+ const s=states.flujo,phi=s.phimax/1000,angle=fluxPhase,instantPhi=phi*Math.sin(angle),induced1=-2*Math.PI*s.f*s.n1*phi*Math.cos(angle),induced2=-2*Math.PI*s.f*s.n2*phi*Math.cos(angle);
+ if($('magPhi'))$('magPhi').textContent=num(instantPhi*1000)+' mWb';
+ if($('magE1'))$('magE1').textContent=num(induced1)+' V';
+ if($('magE2'))$('magE2').textContent=num(induced2)+' V';
+ if($('magTime'))$('magTime').textContent=num(((angle%(2*Math.PI))/(2*Math.PI*s.f))*1000)+' ms';
+ const top=$('fluxArrowTop'),bottom=$('fluxArrowBottom');
+ if(top&&bottom){const pos=instantPhi>=0,mag=Math.abs(Math.sin(angle));top.setAttribute('d',pos?'M365 53 H485':'M485 53 H365');bottom.setAttribute('d',pos?'M485 301 H365':'M365 301 H485');for(const el of [top,bottom]){el.setAttribute('opacity',String(.18+.82*mag));el.setAttribute('stroke-width',String(2+7*mag));}}
+ plotFluxChart(s,angle);fluxRaf=requestAnimationFrame(fluxFrame);
+}
+function plotFluxChart(s,phase){
+ const canvas=$('chart');if(!canvas)return;const ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,left=100,right=W-20,plotWidth=right-left;
+ const maxE1=2*Math.PI*s.f*s.n1*s.phimax/1000,maxE2=2*Math.PI*s.f*s.n2*s.phimax/1000;
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+ for(const [cy,label,unit] of [[80,'Flujo Φ(t)','mWb'],[215,'Tensiones inducidas','V']]){
+  ctx.strokeStyle='#dde6ee';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left,cy);ctx.lineTo(right,cy);ctx.stroke();
+  ctx.fillStyle='#41566c';ctx.font='15px Segoe UI,Arial';ctx.fillText(label,10,cy-47);ctx.font='13px Segoe UI,Arial';ctx.fillText(unit,10,cy-29);
+ }
+ ctx.strokeStyle='#e6edf3';ctx.lineWidth=1;
+ for(let k=0;k<=4;k++){const x=left+plotWidth*k/4;ctx.beginPath();ctx.moveTo(x,22);ctx.lineTo(x,H-32);ctx.stroke();ctx.fillStyle='#536477';ctx.font='14px Arial';ctx.fillText((k/2)+'T',x-8,H-12)}
+ const maxAmp=Math.max(maxE1,maxE2,1e-12);const yPhi=t=>80-52*Math.sin(t),yE1=t=>215+50*(maxE1/maxAmp)*Math.cos(t),yE2=t=>215+50*(maxE2/maxAmp)*Math.cos(t);
+ for(const [color,fn] of [['#2574aa',yPhi],['#b47b35',yE1],['#277c68',yE2]]){
+  ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();for(let k=0;k<=560;k++){const theta=4*Math.PI*k/560;const x=left+plotWidth*k/560,y=fn(theta);if(k===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();
+ }
+ const cursor=left+plotWidth*(phase/(4*Math.PI));ctx.setLineDash([6,5]);ctx.strokeStyle='#475569';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cursor,22);ctx.lineTo(cursor,H-32);ctx.stroke();ctx.setLineDash([]);
+ for(const [color,y] of [['#2574aa',yPhi(phase)],['#b47b35',yE1(phase)],['#277c68',yE2(phase)]]){ctx.fillStyle=color;ctx.beginPath();ctx.arc(cursor,y,5,0,Math.PI*2);ctx.fill()}
+ $('legend').innerHTML='<span class="pill" style="border-left:4px solid #2574aa">Φ(t) (mWb)</span><span class="pill" style="border-left:4px solid #b47b35">e₁(t) (escala relativa)</span><span class="pill" style="border-left:4px solid #277c68">e₂(t) (misma escala)</span>';
+}
+function exerciseSpec(kind,s){
+ if(kind==='ideal'){
+  const a=s.n1/s.n2,v2=s.v1/a,i2=v2/s.r,i1=i2/a;
+  return {task:'Determina la tensión secundaria y las corrientes en régimen ideal con carga resistiva.',expected:[['v2','V₂ (V)',v2],['i2','I₂ (A)',i2],['i1','I₁ (A)',i1]],diagram:drawTrafo(),solution:`a = N₁/N₂ = ${num(a)}<br>V₂ = V₁/a = ${num(v2)} V<br>I₂ = V₂/R = ${num(i2)} A<br>I₁ = I₂/a = ${num(i1)} A`};
+ }
+ if(kind==='diseno'){
+  const phi=s.b*s.afe*1e-4,n1=Math.ceil(s.v1/(INDUCTION_K*s.f*phi)),n2=Math.max(1,Math.round(n1*s.v2/s.v1)),v2real=s.v1*n2/n1,i1=s.snom/s.v1,i2=s.snom/v2real;
+  return {task:'Con una sección eficaz del núcleo y una inducción máxima admisible, calcula el flujo máximo, el número mínimo entero de espiras primarias y el número de espiras secundarias para obtener aproximadamente la tensión deseada. Calcula también I₂ nominal aproximada.',expected:[['phi','Φmáx (mWb)',phi*1000],['n1','N₁ mínimo (espiras)',n1],['n2','N₂ aproximado (espiras)',n2],['i2','I₂ nominal (A)',i2]],diagram:drawTrafo(),solution:`Φmáx = Bmáx · AFe · 10⁻⁴ = ${num(phi*1000)} mWb<br>N₁ ≥ V₁/(4,44·f·Φmáx) → N₁ = ${n1} espiras (redondeo hacia arriba)<br>N₂ ≈ N₁·V₂/V₁ → ${n2} espiras (redondeo al entero)<br>V₂ obtenida ≈ ${num(v2real)} V<br>I₁N ≈ Sₙ/V₁ = ${num(i1)} A<br>I₂N ≈ Sₙ/V₂ obtenida = ${num(i2)} A<br>Secciones orientativas de conductor a J = ${num(s.j)} A/mm²: S₁ ≈ ${num(i1/s.j)} mm², S₂ ≈ ${num(i2/s.j)} mm².`,warning:'Es un dimensionado didáctico inicial: NO define un transformador seguro para construir. Falta verificar ventana de bobinado, temperatura, regulación, aislamiento, seguridad y ensayos.'};
+ }
+ if(kind==='vacio'){
+  const pf=s.p/(s.v*s.i),ife=s.p/s.v,imu=Math.sqrt(Math.max(0,s.i*s.i-ife*ife));
+  return {task:'A partir de las lecturas del ensayo, calcula cos φ₀, RFe y Xμ mediante el modelo aproximado.',expected:[['pf','cos φ₀',pf],['rc','RFe (Ω)',s.v*s.v/s.p],['xm','Xμ (Ω)',imu?s.v/imu:Infinity]],diagram:drawInstruments('vacio'),solution:`cos φ₀ = P₀/(V₁ I₀) = ${num(pf)}<br>IFe = P₀/V₁ = ${num(ife)} A<br>Iμ = √(I₀² − IFe²) = ${num(imu)} A<br>RFe = V₁²/P₀ = ${num(s.v*s.v/s.p)} Ω<br>Xμ = V₁/Iμ = ${num(imu?s.v/imu:Infinity)} Ω`};
+ }
+ if(kind==='corto'){
+  const pf=s.p/(s.v*s.i),z=s.v/s.i,r=s.p/(s.i*s.i),x=Math.sqrt(Math.max(0,z*z-r*r));
+  return {task:'Con las lecturas del ensayo de cortocircuito calcula cos φcc y los parámetros serie referidos al primario.',expected:[['pf','cos φcc',pf],['r','Rcc (Ω)',r],['x','Xcc (Ω)',x]],diagram:drawInstruments('corto'),solution:`cos φcc = Pcc/(V₁cc I₁N) = ${num(pf)}<br>Zcc = V₁cc/I₁N = ${num(z)} Ω<br>Rcc = Pcc/I₁N² = ${num(r)} Ω<br>Xcc = √(Zcc²−Rcc²) = ${num(x)} Ω`};
+ }
+ const a=s.n1/s.n2,r2=a*a*s.r2,x2=a*a*s.x2;
+ return {task:'Refiere las impedancias del secundario al primario y suma las componentes serie.',expected:[['r2','R₂′ (Ω)',r2],['x2','X₂′ (Ω)',x2],['rcc','Rcc (Ω)',s.r1+r2],['xcc','Xcc (Ω)',s.x1+x2]],diagram:drawCircuit(),solution:`a = N₁/N₂ = ${num(a)}; a² = ${num(a*a)}<br>R₂′ = a²R₂ = ${num(r2)} Ω<br>X₂′ = a²X₂ = ${num(x2)} Ω<br>Rcc = R₁ + R₂′ = ${num(s.r1+r2)} Ω<br>Xcc = X₁ + X₂′ = ${num(s.x1+x2)} Ω`};
+}
+function renderExercises(s){
+ const kind=excType,spec=exerciseSpec(kind,s);$('sectionTitle').textContent='Ejercicios · '+excNames[kind];
+ if((kind==='vacio'||kind==='corto') && s.p>s.v*s.i+1e-9){$('fieldstatus').textContent='Lecturas incompatibles: P > V · I.';$('diagram').innerHTML='';$('metrics').innerHTML='';$('explanation').textContent='Revisa la potencia medida.';$('formulas').textContent='P ≤ V · I';return;}
+ $('metrics').innerHTML=reveal?spec.expected.map(([_,label,value])=>metric(label,value)).join(''):'<div class="note">Resultados ocultos. Escribe tus respuestas y compruébalas.</div>';
+ $('diagram').innerHTML=spec.diagram;
+ const inputs=spec.expected.map(([key,label])=>`<div><label for="answer_${key}">${label}</label><input type="text" inputmode="decimal" id="answer_${key}" autocomplete="off" placeholder="Tu respuesta"></div>`).join('');
+ $('explanation').innerHTML=`<div class="quiz-question"><strong>Enunciado:</strong> ${spec.task}</div><div class="quiz-grid">${inputs}</div><div class="actions"><button class="action" id="quizCheck" type="button">Comprobar respuestas</button><button class="action secondary" id="quizReveal" type="button">${reveal?'Ocultar':'Mostrar'} resolución</button></div><div class="quiz-feedback" id="quizFeedback" aria-live="polite"></div>${spec.warning?`<div class="note warning">${spec.warning}</div>`:''}`;
+ $('formulas').innerHTML=reveal?`<div class="quiz-formula">${spec.solution}</div>`:'<span class="status">La resolución aparece al pulsar «Mostrar resolución». Tolerancia de comprobación: ±1 % (números de espiras: exactos).</span>';
+ const ans=excAnswers[kind];for(const [key] of spec.expected){const el=$('answer_'+key);if(Number.isFinite(ans[key]))el.value=String(ans[key]);el.oninput=()=>{const val=el.value.trim().replace(',','.');ans[key]=val!==''&&Number.isFinite(Number(val))?Number(val):null;};}
+ $('quizCheck').onclick=()=>{let correct=0,missing=0;for(const [key,label,target] of spec.expected){const v=ans[key];if(!Number.isFinite(v)){missing++;continue;}const exact=key==='n1'||key==='n2';if(exact?v===target:Math.abs(v-target)<=.01*Math.max(Math.abs(target),1e-8))correct++;}const el=$('quizFeedback');el.className='quiz-feedback '+(correct===spec.expected.length?'correct':'incorrect');el.textContent=`${correct} de ${spec.expected.length} respuestas correctas.${missing?` Faltan ${missing} respuesta(s).`:''} (Margen ±1 %, salvo espiras.)`;};
+ $('quizReveal').onclick=()=>{reveal=!reveal;render()};
+}
+function plot(lines){const canvas=$('chart'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,pad={l:65,r:18,t:22,b:38};ctx.clearRect(0,0,W,H);ctx.fillStyle='white';ctx.fillRect(0,0,W,H);let ext=Math.max(1,...lines.map(o=>Math.abs(o.amplitude)))*1.15;const xp=t=>pad.l+(W-pad.l-pad.r)*t/(4*Math.PI),yp=v=>H/2-v/ext*(H-pad.t-pad.b)/2;ctx.lineWidth=1;ctx.strokeStyle='#e2e8f0';for(let k=-2;k<=2;k++){let y=yp(k*ext/2);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke()}ctx.strokeStyle='#64748b';ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,H-pad.b);ctx.moveTo(pad.l,H/2);ctx.lineTo(W-pad.r,H/2);ctx.stroke();ctx.fillStyle='#526276';ctx.font='15px Arial';ctx.fillText('0',45,H/2-5);ctx.fillText('ωt',W-30,H-14);['0','π','2π','3π','4π'].forEach((x,j)=>ctx.fillText(x,pad.l+j*(W-pad.l-pad.r)/4-6,H-14));lines.forEach(o=>{ctx.strokeStyle=o.color;ctx.lineWidth=3;ctx.beginPath();for(let j=0;j<=550;j++){let t=4*Math.PI*j/550,x=xp(t),y=yp(o.amplitude*Math.sin(t+o.phase));if(!j)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke()});$('legend').innerHTML=lines.map(o=>`<span class="pill" style="border-left:4px solid ${o.color}">${o.label}</span>`).join('');}
+function render(){const s=activeState();$('sectionTitle').textContent=titles[tab];$('graphPanel').classList.toggle('hidden',tab==='equiv'||tab==='ejercicio'||tab==='vacio'||tab==='corto');$('graphTitle').textContent=tab==='flujo'?'Flujo y tensiones inducidas · señales instantáneas':'Ondas de tensión';$('fieldstatus').textContent='';if(!valid(s)){$('metrics').innerHTML='';$('diagram').innerHTML='';$('explanation').textContent='Introduce valores válidos y positivos para tensiones, corrientes, número de espiras y cargas.';$('formulas').textContent='—';return}let m='',diag='',note='',formula='',lines=[];if(tab==='ejercicio'){renderExercises(s);return;}
+if(tab==='flujo'){const phi=s.phimax/1000, e1=INDUCTION_K*s.f*s.n1*phi, e2=INDUCTION_K*s.f*s.n2*phi, a=s.n1/s.n2;m=metric('Φmáx',s.phimax,'mWb')+metric('E₁ eficaz',e1,'V')+metric('E₂ eficaz',e2,'V')+metric('Relación a',a)+metric('Frecuencia',s.f,'Hz');diag=drawMagnetic();note='Ley de Faraday: las tensiones inducidas son proporcionales a la variación temporal del flujo. La f.e.m. inducida en el primario se opone a la tensión aplicada, con las referencias de signo habituales. La representación está ralentizada; el eje temporal del gráfico cubre dos períodos eléctricos.';formula='Φ(t) = Φmáx · sen(2πft)<br>e₁(t) = −N₁ · dΦ/dt = −2π f N₁ Φmáx · cos(2πft)<br>e₂(t) = −N₂ · dΦ/dt = −2π f N₂ Φmáx · cos(2πft)<br>E₁ ≈ 4,44 · f · N₁ · Φmáx<br>E₂ ≈ 4,44 · f · N₂ · Φmáx<br>E₁ / E₂ = N₁ / N₂<br>En el ideal, V₁ ≈ −E₁ con polaridades coherentes.';}
+
+if(tab==='ideal'){let a=s.n1/s.n2,v2=s.v1/a,i2=v2/s.r,i1=i2/a,p=s.v1*i1;m=metric('Relación a',a)+metric('V₂',v2,'V')+metric('I₂',i2,'A')+metric('I₁',i1,'A')+metric('Potencia primaria',p,'W')+metric('Potencia secundaria',p,'W');diag=drawTrafo();formula='a = N₁ / N₂ = V₁ / V₂ = I₂ / I₁<br>V₂ = V₁ / a<br>I₂ = V₂ / R<br>I₁ = I₂ / a<br>P₁ = P₂ = V₂ · I₂';note='Las tensiones y corrientes son eficaces (RMS). El modelo ideal supone P₁ = P₂ y corriente magnetizante nula.';lines=[{label:'V₁ (normalizada)',amplitude:1,color:'#d68b37',phase:0},{label:'V₂ (normalizada)',amplitude:1,color:'#277cac',phase:0}];}
+if(tab==='real'){const a=s.n1/s.n2;let zload=c(s.r,s.x),zs=c(s.r2,s.x2),zp=c(s.r1,s.x1),u=c(s.v1),i2=div(u,add(add(zp,scale(zs,a*a)),scale(zload,a*a))),i02=add(div(u,c(s.rc)),div(u,c(0,s.xm))),i1=add(i02,i2),iSec=scale(i2,a),u2=mul(iSec,zload),pin=(mul(u,conj(i1))).re,pout=(mul(u2,conj(iSec))).re,pCu1=abs(i2)**2*s.r1,pCu2=abs(iSec)**2*s.r2,pFe=s.v1*s.v1/s.rc,magne=s.v1*s.v1/s.xm,eta=100*pout/pin;let u1Branch=add(u2,mul(iSec,zs));m=metric('V₂ en carga',abs(u2),'V')+metric('I₂',abs(iSec),'A')+metric('I₁',abs(i1),'A')+metric('P entrada',pin,'W')+metric('P salida',pout,'W')+metric('Rendimiento',eta,'%')+metric('Pérdidas cobre',pCu1+pCu2,'W')+metric('Pérdidas hierro',pFe,'W');diag=drawCircuit();formula='a = N₁/N₂; Z₂′ = a² · Z₂; Zcarga′ = a² · Zcarga<br>I₂′ = V₁ / (Z₁ + Z₂′ + Zcarga′)<br>I₀ = V₁/RFe + V₁/(jXm)<br>I₁ = I₀ + I₂′; I₂ = a · I₂′<br>V₂ = I₂ · Zcarga<br>Pcu = |I₂′|² R₁ + |I₂|² R₂; Pfe = V₁²/RFe<br>η = 100 · P₂/P₁';note=`Aproximación con rama de vacío en la entrada. Fasores: I₁ = ${ph(i1)} A; I₂ = ${ph(iSec)} A; V₂ = ${ph(u2)} V. Balance: P₁ ≈ P₂ + Pcu + Pfe. La potencia magnetizante reactiva modelada es ${num(magne)} var. Los parámetros serie no contemplan saturación ni efectos térmicos.`;lines=[{label:'V₁ (normalizada)',amplitude:1,color:'#d68b37',phase:0},{label:'V₂ (normalizada)',amplitude:1,color:'#277cac',phase:Math.atan2(u2.im,u2.re)}];}
+if(tab==='equiv'){let a=s.n1/s.n2,r2p=a*a*s.r2,x2p=a*a*s.x2;m=metric('a = N₁/N₂',a)+metric('a²',a*a)+metric('R₂′',r2p,'Ω')+metric('X₂′',x2p,'Ω')+metric('Rcc = R₁ + R₂′',s.r1+r2p,'Ω')+metric('Xcc = X₁ + X₂′',s.x1+x2p,'Ω');diag=drawCircuit();formula='R₂′ = a² · R₂<br>X₂′ = a² · X₂<br>Rcc = R₁ + R₂′<br>Xcc = X₁ + X₂′<br>Zcc = √(Rcc² + Xcc²)';note='La prima (′) indica que el parámetro del secundario está referido al primario. La rama de magnetización, si se expresa desde el primario, ya está en unidades de ese lado.'}
+if(tab==='vacio'){let pf=s.p/(s.v*s.i);if(pf>1+1e-10){$('fieldstatus').textContent='Lecturas incompatibles: P debe ser ≤ V · I.';$('metrics').innerHTML='';$('diagram').innerHTML=drawInstruments(tab);$('explanation').textContent='Revisa los tres instrumentos.';$('formulas').textContent='P ≤ V · I';return}pf=Math.min(1,pf);let ia=s.p/s.v,im=Math.sqrt(Math.max(0,s.i*s.i-ia*ia)),rc=s.v/ia,xm=im===0?Infinity:s.v/im;m=metric('cos φ₀',pf)+metric('IFe',ia,'A')+metric('Iμ',im,'A')+metric('RFe',rc,'Ω')+metric('Xm',xm,'Ω')+metric('Q₀',s.v*im,'var');diag=drawInstruments(tab)+drawTestEquivalent('vacio',{rc,xm})+fasorVacio(ia,im);formula='P₀ ≈ PFe = V₁ · I₀ · cos φ₀<br>cos φ₀ = P₀ / (V₁ · I₀)<br>IFe = I₀ · cos φ₀ = P₀ / V₁<br>Iμ = I₀ · sen φ₀ = √(I₀² − IFe²)<br>RFe ≈ V₁ / IFe = V₁² / P₀<br>Xμ ≈ V₁ / Iμ';note='Siguiendo la figura de referencia, A₁ mide I₀, V₁ mide la tensión del primario y W mide P₀. En vacío la potencia medida se aproxima a las pérdidas en el hierro, despreciando las pequeñas pérdidas en cobre del devanado alimentado. Si Im = 0, Xm tiende a infinito.';}
+if(tab==='corto'){let pf=s.p/(s.v*s.i);if(pf>1+1e-10){$('fieldstatus').textContent='Lecturas incompatibles: P debe ser ≤ V · I.';$('metrics').innerHTML='';$('diagram').innerHTML=drawInstruments(tab);$('explanation').textContent='Revisa los tres instrumentos.';$('formulas').textContent='P ≤ V · I';return}pf=Math.min(1,pf);let z=s.v/s.i,r=s.p/(s.i*s.i),x=Math.sqrt(Math.max(0,z*z-r*r));m=metric('Zcc',z,'Ω')+metric('Rcc',r,'Ω')+metric('Xcc',x,'Ω')+metric('cos φcc',pf)+metric('Pcu ≈ Pcc',s.p,'W');diag=drawInstruments(tab)+drawTestEquivalent('corto',{r,x})+fasorCorto(r,x,s.i);formula='Pcc = V₁cc · I₁N · cos φcc<br>cos φcc = Pcc / (V₁cc · I₁N)<br>Zcc = V₁cc / I₁N<br>VRcc = V₁cc · cos φcc = I₁N · Rcc<br>VXcc = V₁cc · sen φcc = I₁N · Xcc<br>Rcc = Pcc / I₁N²<br>Xcc = √(Zcc² − Rcc²)';note='Siguiendo la figura de referencia, A₁ mide I₁N, V₁ mide V₁cc, W mide Pcc y A₂ mide I₂. Al alimentar con tensión reducida, se aproxima la potencia medida a las pérdidas en cobre. La tensión se incrementa hasta alcanzar la corriente nominal. No simula un cortocircuito conectado directamente a la red.';}
+$('metrics').innerHTML=m;$('diagram').innerHTML=diag;$('explanation').innerHTML=note;$('formulas').innerHTML=formula;if(lines.length)plot(lines);if(tab==='flujo'){const pause=$('fluxPause'),restart=$('fluxRestart');if(pause)pause.onclick=()=>{fluxPaused=!fluxPaused;pause.textContent=fluxPaused?'Reanudar animación':'Pausar animación'};if(restart)restart.onclick=()=>{fluxPhase=0;fluxLastTime=0};if(!fluxActive)startFlux();}}
+tabs.forEach(b=>b.addEventListener('click',()=>{if(tab==='flujo')stopFlux();tab=b.dataset.tab;reveal=false;tabs.forEach(x=>x.classList.toggle('active',x===b));inputs();render()}));$('reset').onclick=()=>{if(tab==='ejercicio'){exStates[excType]=structuredClone(excDefaults[excType]);excAnswers[excType]={};}else states[tab]=structuredClone(defaults[tab]);if(tab==='flujo'){fluxPhase=0;stopFlux();}reveal=false;inputs();render()};inputs();render();
+</script></body></html>
